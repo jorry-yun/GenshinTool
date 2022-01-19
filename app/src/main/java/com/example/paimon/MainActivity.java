@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
                 lLayoutParams.setLayoutDirection(LinearLayout.HORIZONTAL);
-                lLayoutParams.setMargins(0, 15, 0, 0);
+                lLayoutParams.setMargins(0, SystemUtil.Dp2Px(this, 15), 0, 0);
                 line.setLayoutParams(lLayoutParams);
                 for (String No :list) {
                     TextView accountText = generateTextView(R.color.blue, No);
