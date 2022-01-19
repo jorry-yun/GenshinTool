@@ -72,28 +72,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         EditText content = findViewById(R.id.content);
         // 读取缓存
-        SharedPreferences paimon = getSharedPreferences("paimon", MODE_PRIVATE);
-        String cacheUrl = paimon.getString("content", "");
+        SharedPreferences cache = getSharedPreferences("cache", MODE_PRIVATE);
+        String cacheUrl = cache.getString("content", "");
         content.setText(cacheUrl);
         // 监听按钮点击事件
-        TextView button = findViewById(R.id.button);
-        button.setOnClickListener((view) -> {
-            String url = content.getText().toString();
-            if (url.length() != 0) {
-                Map<String, String> resultMap = parseUrl(url);
-                String authKey = resultMap.get("authkey");
-                if (authKey != null && authKey.length() > 0) {
-                    // 设置缓存
-                    paimon.edit().putString("content", url).apply();
-                    Toast.makeText(this, "正在获取祈愿池信息，时间可能有点长，请耐心等待", Toast.LENGTH_SHORT).show();
-                    sendMessage(0, toUrl(resultMap) + "&gacha_type=", handler2);
-                } else {
-                    showDialog("输入的链接有误，请检查");
-                }
-            } else {
-                showDialog("请输入抽卡记录链接！");
-            }
-        });
+        setOnClickListener(content, cache);
+        createAccount(cache);
 
 //        TextView moni = findViewById(R.id.moni);
 //        moni.setOnClickListener((view) -> {
@@ -122,12 +106,12 @@ public class MainActivity extends AppCompatActivity {
 //                    j = 0;
 //                }
 //                if (i == 74) {
-//                    vo.setName("莫娜");
+//                    vo.setName("");
 //                    vo.setRank_type("5");
 //                }
 //                data.add(vo);
 //            }
-//            paimon.edit().putString("100049717-301", GsonUtil.toJson(data)).apply();
+//            cache.edit().putString("100049717-301", GsonUtil.toJson(data)).apply();
 //            Toast.makeText(this, "模拟数据生成成功", Toast.LENGTH_SHORT).show();
 //        });
 
@@ -137,6 +121,74 @@ public class MainActivity extends AppCompatActivity {
             Intent tipsIntent = new Intent(this, TipActivity.class);
             startActivity(tipsIntent);
         });
+    }
+
+    private void setOnClickListener(EditText content, SharedPreferences cache) {
+        TextView button = findViewById(R.id.button);
+        button.setOnClickListener((view) -> {
+            String url = content.getText().toString();
+            if (url.length() != 0) {
+                Map<String, String> resultMap = parseUrl(url);
+                String authKey = resultMap.get("authkey");
+                if (authKey != null && authKey.length() > 0) {
+                    // 设置缓存
+                    cache.edit().putString("content", url).apply();
+                    Toast.makeText(this, "正在获取祈愿池信息，时间可能有点长，请耐心等待", Toast.LENGTH_SHORT).show();
+                    sendMessage(0, toUrl(resultMap) + "&gacha_type=", handler2);
+                } else {
+                    showDialog("输入的链接有误，请检查");
+                }
+            } else {
+                showDialog("请输入抽卡记录链接！");
+            }
+        });
+    }
+
+    private void createAccount(SharedPreferences cache) {
+        List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
+        if (!uids.isEmpty()) {
+            showCacheRecord(uids.get(0), cache);
+            LinearLayout account = findViewById(R.id.account);
+            for (List<String> list : splitList(uids, 3)) {
+                // 一行
+                LinearLayout line = new LinearLayout(MainActivity.this);
+                LinearLayout.LayoutParams lLayoutParams = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                lLayoutParams.setLayoutDirection(LinearLayout.HORIZONTAL);
+                lLayoutParams.setMargins(0, 0, 0, 15);
+                line.setLayoutParams(lLayoutParams);
+                for (String No :list) {
+                    TextView accountText = generateTextView(R.color.blue, No);
+                    accountText.setOnClickListener((view) -> showCacheRecord(((TextView) view).getText().toString(), cache));
+                    line.addView(accountText);
+                }
+                account.addView(line);
+            }
+        }
+    }
+
+    private List<List<String>> splitList(List<String> list, int size) {
+        List<List<String>> result = new ArrayList<>();
+        for (int i = 0; i < list.size(); i+=size) {
+            List<String> subList = list.subList(i, Math.min(i + size, list.size() - 1));
+            if (!subList.isEmpty()) {
+                result.add(subList);
+            }
+        }
+        return result;
+    }
+
+    private void showCacheRecord(String uid, SharedPreferences cache) {
+        // 角色池
+        String character = cache.getString(uid + "-301", "[]");
+        showCharacter(GsonUtil.jsonToList(character, WishVo.class));
+        // 常驻池
+        String standard = cache.getString(uid + "-200", "[]");
+        showStandard(GsonUtil.jsonToList(standard, WishVo.class));
+        // 武器池
+        String weapon = cache.getString(uid + "-302", "[]");
+        showWeapon(GsonUtil.jsonToList(weapon, WishVo.class));
     }
 
     private void sendMessage(int what, String data, Handler handler) {
@@ -191,7 +243,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences paimon = getSharedPreferences("paimon", MODE_PRIVATE);
         String uid = paimon.getString("uid", "[]");
         List<String> uids = GsonUtil.jsonToList(uid, String.class);
-        uids.add(id);
+        uids.remove(id);
+        uids.add(0, id);
         paimon.edit().putString("uid", GsonUtil.toJson(uids)).apply();
         // 处理祈愿历史记录
         String history = paimon.getString(id + "-" + type, "");
