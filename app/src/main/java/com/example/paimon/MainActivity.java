@@ -43,11 +43,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final String CACHE_NAME = "paimon";
+
+    private final String WISH_URL_TEMPLATE = "https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?%s&page=%&size=20&end_id=%s";
+
     private Handler handler1 = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             String data = msg.getData().getString("data");
-            Log.d(data);
             List<WishVo> wishList = GsonUtil.jsonToList(data, WishVo.class);
             switch (msg.what) {
                 case 1: showCharacter(wishList); break;
@@ -72,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         EditText content = findViewById(R.id.content);
         // 读取缓存
-        SharedPreferences cache = getSharedPreferences("cache", MODE_PRIVATE);
+        SharedPreferences cache = getSharedPreferences(CACHE_NAME, MODE_PRIVATE);
         String cacheUrl = cache.getString("content", "");
         content.setText(cacheUrl);
         // 监听按钮点击事件
@@ -146,32 +149,35 @@ public class MainActivity extends AppCompatActivity {
 
     private void createAccount(SharedPreferences cache) {
         List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
+        LinearLayout account = findViewById(R.id.account);
         if (!uids.isEmpty()) {
             showCacheRecord(uids.get(0), cache);
-            LinearLayout account = findViewById(R.id.account);
-            for (List<String> list : splitList(uids, 3)) {
+            for (List<String> list : splitList(uids, 4)) {
                 // 一行
                 LinearLayout line = new LinearLayout(MainActivity.this);
                 LinearLayout.LayoutParams lLayoutParams = new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
                 lLayoutParams.setLayoutDirection(LinearLayout.HORIZONTAL);
-                lLayoutParams.setMargins(0, 0, 0, 15);
+                lLayoutParams.setMargins(0, 15, 0, 0);
                 line.setLayoutParams(lLayoutParams);
                 for (String No :list) {
                     TextView accountText = generateTextView(R.color.blue, No);
+                    accountText.setTextSize(15);
                     accountText.setOnClickListener((view) -> showCacheRecord(((TextView) view).getText().toString(), cache));
                     line.addView(accountText);
                 }
                 account.addView(line);
             }
+        } else {
+             account.addView(generateTextView(R.color.black, "暂无账号可切换"));
         }
     }
 
     private List<List<String>> splitList(List<String> list, int size) {
         List<List<String>> result = new ArrayList<>();
         for (int i = 0; i < list.size(); i+=size) {
-            List<String> subList = list.subList(i, Math.min(i + size, list.size() - 1));
+            List<String> subList = list.subList(i, Math.min(i + size, list.size()));
             if (!subList.isEmpty()) {
                 result.add(subList);
             }
@@ -238,25 +244,25 @@ public class MainActivity extends AppCompatActivity {
         if (wishList == null || wishList.isEmpty()) {
             return wishList;
         }
-        String id = wishList.get(0).getUid();
+        String uid = wishList.get(0).getUid();
         // 处理uid
-        SharedPreferences paimon = getSharedPreferences("paimon", MODE_PRIVATE);
-        String uid = paimon.getString("uid", "[]");
-        List<String> uids = GsonUtil.jsonToList(uid, String.class);
-        uids.remove(id);
-        uids.add(0, id);
-        paimon.edit().putString("uid", GsonUtil.toJson(uids)).apply();
+        SharedPreferences cache = getSharedPreferences(CACHE_NAME, MODE_PRIVATE);
+        List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
+        if (!uids.contains(uid)) {
+            uids.add(uid);
+        }
+        cache.edit().putString("uid", GsonUtil.toJson(uids)).apply();
         // 处理祈愿历史记录
-        String history = paimon.getString(id + "-" + type, "");
+        String history = cache.getString(uid + "-" + type, "");
         if (!history.isEmpty()) {
             List<WishVo> cachedWish = GsonUtil.jsonToList(history, WishVo.class);
             Set<String> ids = cachedWish.stream().map(WishVo::getId).collect(Collectors.toSet());
             wishList = wishList.stream().filter(wish -> !ids.contains(wish.getId())).collect(Collectors.toList());
             cachedWish.addAll(0, wishList);
-            paimon.edit().putString(id + "-" + type, GsonUtil.toJson(cachedWish)).apply();
+            cache.edit().putString(uid + "-" + type, GsonUtil.toJson(cachedWish)).apply();
             return cachedWish;
         }
-        paimon.edit().putString(id + "-" + type, GsonUtil.toJson(wishList)).apply();
+        cache.edit().putString(uid + "-" + type, GsonUtil.toJson(wishList)).apply();
         return wishList;
     }
 
@@ -530,7 +536,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void doRequest(int page, String endId, String urlQuery, List<WishVo> wishList, int interval, RequestHandler handler) {
-        String url = "https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?" + urlQuery + "&page=" + page + "&size=20&end_id=" + endId;
+        String url = String.format(WISH_URL_TEMPLATE, urlQuery, page, endId);
         new HttpUtil().get(url, RequestResult.class, new HttpCallBack<RequestResult>() {
             @Override
             public void onSuccess(RequestResult result) {
