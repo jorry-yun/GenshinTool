@@ -31,4 +31,7 @@
         android:name="android.permission.INTERNET"
         tools:ignore="ManifestOrder" />
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+
 </manifest>

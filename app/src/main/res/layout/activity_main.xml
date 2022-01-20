@@ -74,7 +74,7 @@
                 android:gravity="center_vertical"
                 android:textSize="@dimen/default_font_size"
                 android:textColor="@color/white"
-                android:text="分析"
+                android:text="@string/query"
                 android:background="@drawable/bg_button_press"
                 tools:ignore="RtlCompat"
                 android:clickable="true"
@@ -121,7 +121,7 @@
                     android:text="角色活动祈愿"/>
 
                 <TextView
-                    android:id="@+id/part_overview"
+                    android:id="@+id/character_overview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -139,7 +139,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
                         <TextView
-                            android:id="@+id/part_five_num"
+                            android:id="@+id/character_five_num"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
@@ -148,7 +148,7 @@
                             android:text="五星："/>
 
                         <TextView
-                            android:id="@+id/part_four_num"
+                            android:id="@+id/character_four_num"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
@@ -157,7 +157,7 @@
                             android:text="四星："/>
 
                         <TextView
-                            android:id="@+id/part_three_num"
+                            android:id="@+id/character_three_num"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
@@ -171,7 +171,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
                         <TextView
-                            android:id="@+id/part_five_pro"
+                            android:id="@+id/character_five_pro"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
@@ -181,7 +181,7 @@
                             android:text="【  】"/>
 
                         <TextView
-                            android:id="@+id/part_four_pro"
+                            android:id="@+id/character_four_pro"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
@@ -191,7 +191,7 @@
                             android:text="【  】"/>
 
                         <TextView
-                            android:id="@+id/part_three_pro"
+                            android:id="@+id/character_three_pro"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
@@ -227,7 +227,7 @@
                         android:text="五星出货顺序："/>
 
                     <LinearLayout
-                        android:id="@+id/part_five_seq"
+                        android:id="@+id/character_five_seq"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
@@ -259,7 +259,7 @@
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/part_five_avg"
+                    android:id="@+id/character_five_avg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -267,7 +267,7 @@
                     android:text="五星平均出货抽数为："/>
 
                 <TextView
-                    android:id="@+id/part_four_avg"
+                    android:id="@+id/character_four_avg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"

@@ -11,6 +11,7 @@ import android.os.Message;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final String CACHE_NAME = "paimon";
 
-    private final String WISH_URL_TEMPLATE = "https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?%s&page=%&size=20&end_id=%s";
+    private final String WISH_URL_TEMPLATE = "https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?%s&page=%s&size=20&end_id=%s";
 
     private Handler handler1 = new Handler() {
         @Override
@@ -53,9 +54,15 @@ public class MainActivity extends AppCompatActivity {
             String data = msg.getData().getString("data");
             List<WishVo> wishList = GsonUtil.jsonToList(data, WishVo.class);
             switch (msg.what) {
-                case 1: showCharacter(wishList); break;
-                case 2: showStandard(wishList); break;
-                case 3: showWeapon(wishList); break;
+                case 1: showDetail(wishList, "character");
+                    Toast.makeText(MainActivity.this, "角色池加载完成", Toast.LENGTH_SHORT).show();
+                    break;
+                case 2: showDetail(wishList, "standard");
+                    Toast.makeText(MainActivity.this, "常驻池加载完成", Toast.LENGTH_SHORT).show();
+                    break;
+                case 3: showDetail(wishList, "weapon");
+                    Toast.makeText(MainActivity.this, "武器池加载完成", Toast.LENGTH_SHORT).show();
+                    break;
             }
         }
     };
@@ -80,7 +87,11 @@ public class MainActivity extends AppCompatActivity {
         content.setText(cacheUrl);
         // 监听按钮点击事件
         setOnClickListener(content, cache);
-        createAccount(cache);
+        List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
+        createAccount(cache, uids);
+        if (!uids.isEmpty()) {
+            showCacheRecord(uids.get(0), cache);
+        }
 
 //        TextView moni = findViewById(R.id.moni);
 //        moni.setOnClickListener((view) -> {
@@ -131,13 +142,14 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener((view) -> {
             String url = content.getText().toString();
             if (url.length() != 0) {
-                Map<String, String> resultMap = parseUrl(url);
+                Map<String, String> resultMap = CommUtil.getInstance().parseUrl(url);
                 String authKey = resultMap.get("authkey");
                 if (authKey != null && authKey.length() > 0) {
                     // 设置缓存
                     cache.edit().putString("content", url).apply();
                     Toast.makeText(this, "正在获取祈愿池信息，时间可能有点长，请耐心等待", Toast.LENGTH_SHORT).show();
-                    sendMessage(0, toUrl(resultMap) + "&gacha_type=", handler2);
+                    String urlQuery = CommUtil.getInstance().toUrl(resultMap);
+                    CommUtil.getInstance().sendMessage(0, urlQuery + "&gacha_type=", handler2);
                 } else {
                     showDialog("输入的链接有误，请检查");
                 }
@@ -147,23 +159,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void createAccount(SharedPreferences cache) {
-        List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
+    private void createAccount(SharedPreferences cache, List<String> uids) {
         LinearLayout account = findViewById(R.id.account);
+        account.removeAllViews();
         if (!uids.isEmpty()) {
-            showCacheRecord(uids.get(0), cache);
-            for (List<String> list : splitList(uids, 4)) {
+            for (List<String> list : CommUtil.getInstance().splitList(uids, 3)) {
                 // 一行
                 LinearLayout line = new LinearLayout(MainActivity.this);
                 LinearLayout.LayoutParams lLayoutParams = new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
                 lLayoutParams.setLayoutDirection(LinearLayout.HORIZONTAL);
-                lLayoutParams.setMargins(0, SystemUtil.Dp2Px(this, 15), 0, 0);
                 line.setLayoutParams(lLayoutParams);
                 for (String No :list) {
                     TextView accountText = generateTextView(R.color.blue, No);
-                    accountText.setTextSize(15);
+                    LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) accountText.getLayoutParams();
+                    layoutParams.setMargins(0, SystemUtil.Dp2Px(this, -2), SystemUtil.Dp2Px(this, 15), SystemUtil.Dp2Px(this, 15));
+                    accountText.setTextSize(SystemUtil.Dp2Px(this, 4.5f));
                     accountText.setOnClickListener((view) -> showCacheRecord(((TextView) view).getText().toString(), cache));
                     line.addView(accountText);
                 }
@@ -174,58 +186,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private List<List<String>> splitList(List<String> list, int size) {
-        List<List<String>> result = new ArrayList<>();
-        for (int i = 0; i < list.size(); i+=size) {
-            List<String> subList = list.subList(i, Math.min(i + size, list.size()));
-            if (!subList.isEmpty()) {
-                result.add(subList);
-            }
-        }
-        return result;
+    private  <T extends View> T findViewById(String name) {
+        int id = getResources().getIdentifier(name, "id", getPackageName());
+        return findViewById(id);
     }
 
     private void showCacheRecord(String uid, SharedPreferences cache) {
         // 角色池
         String character = cache.getString(uid + "-301", "[]");
-        showCharacter(GsonUtil.jsonToList(character, WishVo.class));
+        showDetail(GsonUtil.jsonToList(character, WishVo.class), "character");
         // 常驻池
         String standard = cache.getString(uid + "-200", "[]");
-        showStandard(GsonUtil.jsonToList(standard, WishVo.class));
+        showDetail(GsonUtil.jsonToList(standard, WishVo.class), "standard");
         // 武器池
         String weapon = cache.getString(uid + "-302", "[]");
-        showWeapon(GsonUtil.jsonToList(weapon, WishVo.class));
-    }
-
-    private void sendMessage(int what, String data, Handler handler) {
-        Message msg = new Message();
-        msg.what = what;
-        Bundle bundle = new Bundle();
-        bundle.putString("data", data);
-        msg.setData(bundle);
-        handler.sendMessage(msg);
-    }
-
-    private Map<String, String> parseUrl(String url) {
-        Map<String, String> result = new HashMap<>();
-        url = url.substring(url.indexOf("?") + 1);
-        for (String s : url.split("&")) {
-            if (s.contains("=")) {
-                result.put(s.split("=")[0], s.split("=")[1]);
-            }
-        }
-        return result;
-    }
-
-    private String toUrl(Map<String, String> resultMap) {
-        StringBuilder url = new StringBuilder();
-        for (String key : resultMap.keySet()) {
-            if ("game_biz".equals(key)) {
-                resultMap.put(key, "hk4e_cn");
-            }
-            url.append(key).append("=").append(resultMap.get(key)).append("&");
-        }
-        return url.substring(0, url.length() - 2);
+        showDetail(GsonUtil.jsonToList(weapon, WishVo.class), "weapon");
     }
 
     private void doWish(String query, int what) {
@@ -234,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
             requestHistory(query + type.get(what),  (wishList) -> {
                 wishList = handleWishCache(wishList, type.get(what));
                 String data = GsonUtil.toJson(Optional.ofNullable(wishList).orElse(new ArrayList<>()));
-                sendMessage(what, data, handler1);
+                CommUtil.getInstance().sendMessage(what, data, handler1);
                 doWish(query, what + 1);
             });
         }
@@ -252,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
             uids.add(uid);
         }
         cache.edit().putString("uid", GsonUtil.toJson(uids)).apply();
+        createAccount(cache, uids);
         // 处理祈愿历史记录
         String history = cache.getString(uid + "-" + type, "");
         if (!history.isEmpty()) {
@@ -266,17 +242,17 @@ public class MainActivity extends AppCompatActivity {
         return wishList;
     }
 
-    private void showCharacter(List<WishVo> wishVo) {
+    public void showDetail(List<WishVo> wishVo, String prefix) {
         Map<String, Object> result = analysis(wishVo);
-        TextView partOverview = findViewById(R.id.part_overview);
-        TextView partFiveNum = findViewById(R.id.part_five_num);
-        TextView partFourNum = findViewById(R.id.part_four_num);
-        TextView partThreeNum = findViewById(R.id.part_three_num);
-        TextView partFivePro = findViewById(R.id.part_five_pro);
-        TextView partFourPro = findViewById(R.id.part_four_pro);
-        TextView partThreePro = findViewById(R.id.part_three_pro);
-        TextView partFiveAvg = findViewById(R.id.part_five_avg);
-        TextView partFourAvg = findViewById(R.id.part_four_avg);
+        TextView partOverview = findViewById(prefix + "_overview");
+        TextView partFiveNum = findViewById(prefix + "_five_num");
+        TextView partFourNum = findViewById(prefix + "_four_num");
+        TextView partThreeNum = findViewById(prefix + "_three_num");
+        TextView partFivePro = findViewById(prefix + "_five_pro");
+        TextView partFourPro = findViewById(prefix + "_four_pro");
+        TextView partThreePro = findViewById(prefix + "_three_pro");
+        TextView partFiveAvg = findViewById(prefix + "_five_avg");
+        TextView partFourAvg = findViewById(prefix + "_four_avg");
         partFiveNum.setText((String) result.get("five_num"));
         partFourNum.setText((String) result.get("four_num"));
         partThreeNum.setText((String) result.get("three_num"));
@@ -299,47 +275,9 @@ public class MainActivity extends AppCompatActivity {
         fourExpendStyle.setSpan(new ForegroundColorSpan(Color.MAGENTA), 9, four_avg.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
         partFourAvg.setText(fourExpendStyle);
         // 设置五星出货顺序
-        addSequence((List<WishVo>) result.get("five_seq"), findViewById(R.id.part_five_seq), "金");
+        addSequence((List<WishVo>) result.get("five_seq"), findViewById(prefix + "_five_seq"), "金");
         // 设置四星出货顺序
-        addSequence((List<WishVo>) result.get("four_seq"), findViewById(R.id.character_four_seq), "紫");
-    }
-
-    private void showStandard(List<WishVo> wishVo) {
-        TextView standardOverview = findViewById(R.id.standard_overview);
-        TextView standardFiveNum = findViewById(R.id.standard_five_num);
-        TextView standardFourNum = findViewById(R.id.standard_four_num);
-        TextView standardThreeNum = findViewById(R.id.standard_three_num);
-        TextView standardFivePro = findViewById(R.id.standard_five_pro);
-        TextView standardFourPro = findViewById(R.id.standard_four_pro);
-        TextView standardThreePro = findViewById(R.id.standard_three_pro);
-        TextView standardFiveAvg = findViewById(R.id.standard_five_avg);
-        TextView standardFourAvg = findViewById(R.id.standard_four_avg);
-        Map<String, Object> result = analysis(wishVo);
-        standardFiveNum.setText((String) result.get("five_num"));
-        standardFourNum.setText((String) result.get("four_num"));
-        standardThreeNum.setText((String) result.get("three_num"));
-        standardFivePro.setText((String) result.get("five_pro"));
-        standardFourPro.setText((String) result.get("four_pro"));
-        standardThreePro.setText((String) result.get("three_pro"));
-        String five_avg = (String) result.get("five_avg");
-        standardFiveAvg.setText(five_avg);
-        String four_avg = (String) result.get("four_avg");
-        standardFourAvg.setText(four_avg);
-        // 概览样式
-        SpannableStringBuilder overviewStyle = getOverviewStyle(wishVo, (String) result.get("overview"));
-        standardOverview.setText(overviewStyle);
-        // 五星平均出货抽数样式
-        SpannableStringBuilder fiveExpendStyle = new SpannableStringBuilder(five_avg);
-        fiveExpendStyle.setSpan(new ForegroundColorSpan(Color.MAGENTA), 9, five_avg.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-        standardFiveAvg.setText(fiveExpendStyle);
-        // 四星平均出货抽数样式
-        SpannableStringBuilder fourExpendStyle = new SpannableStringBuilder(four_avg);
-        fourExpendStyle.setSpan(new ForegroundColorSpan(Color.MAGENTA), 9, four_avg.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-        standardFourAvg.setText(fourExpendStyle);
-        // 设置五星出货顺序
-        addSequence((List<WishVo>) result.get("five_seq"), findViewById(R.id.standard_five_seq), "金");
-        // 设置四星出货顺序
-        addSequence((List<WishVo>) result.get("four_seq"), findViewById(R.id.standard_four_seq), "紫");
+        addSequence((List<WishVo>) result.get("four_seq"), findViewById(prefix + "_four_seq"), "紫");
     }
 
     private SpannableStringBuilder getOverviewStyle(List<WishVo> wishVo, String overview) {
@@ -352,44 +290,6 @@ public class MainActivity extends AppCompatActivity {
         overviewStyle.setSpan(new ForegroundColorSpan(Color.MAGENTA), 9 + length, second, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
         overviewStyle.setSpan(new ForegroundColorSpan(Color.MAGENTA), second + 7, third, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
         return overviewStyle;
-    }
-
-    private void showWeapon(List<WishVo> wishVo) {
-        TextView weaponOverview = findViewById(R.id.weapon_overview);
-        TextView weaponFiveNum = findViewById(R.id.weapon_five_num);
-        TextView weaponFourNum = findViewById(R.id.weapon_four_num);
-        TextView weaponThreeNum = findViewById(R.id.weapon_three_num);
-        TextView weaponFivePro = findViewById(R.id.weapon_five_pro);
-        TextView weaponFourPro = findViewById(R.id.weapon_four_pro);
-        TextView weaponThreePro = findViewById(R.id.weapon_three_pro);
-        TextView weaponFiveAvg = findViewById(R.id.weapon_five_avg);
-        TextView weaponFourAvg = findViewById(R.id.weapon_four_avg);
-        Map<String, Object> result = analysis(wishVo);
-        weaponFiveNum.setText((String) result.get("five_num"));
-        weaponFourNum.setText((String) result.get("four_num"));
-        weaponThreeNum.setText((String) result.get("three_num"));
-        weaponFivePro.setText((String) result.get("five_pro"));
-        weaponFourPro.setText((String) result.get("four_pro"));
-        weaponThreePro.setText((String) result.get("three_pro"));
-        String five_avg = (String) result.get("five_avg");
-        weaponFiveAvg.setText(five_avg);
-        String four_avg = (String) result.get("four_avg");
-        weaponFourAvg.setText(four_avg);
-        // 概览样式
-        SpannableStringBuilder overviewStyle = getOverviewStyle(wishVo, (String) result.get("overview"));
-        weaponOverview.setText(overviewStyle);
-        // 五星平均出货抽数样式
-        SpannableStringBuilder fiveExpendStyle = new SpannableStringBuilder(five_avg);
-        fiveExpendStyle.setSpan(new ForegroundColorSpan(Color.MAGENTA), 9, five_avg.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-        weaponFiveAvg.setText(fiveExpendStyle);
-        // 四星平均出货抽数样式
-        SpannableStringBuilder fourExpendStyle = new SpannableStringBuilder(four_avg);
-        fourExpendStyle.setSpan(new ForegroundColorSpan(Color.MAGENTA), 9, four_avg.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-        weaponFourAvg.setText(fourExpendStyle);
-        // 设置五星出货顺序
-        addSequence((List<WishVo>) result.get("five_seq"), findViewById(R.id.weapon_five_seq), "金");
-        // 设置四星出货顺序
-        addSequence((List<WishVo>) result.get("four_seq"), findViewById(R.id.weapon_four_seq), "紫");
     }
 
     private void addSequence(List<WishVo> wishList, LinearLayout content, String color) {
