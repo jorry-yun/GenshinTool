@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         tips.setOnClickListener((view) -> {
             Intent tipsIntent = new Intent(this, TipActivity.class);
             startActivity(tipsIntent);
+
         });
     }
 
