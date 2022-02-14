@@ -12,8 +12,11 @@ import android.widget.TextView;
 
 import com.example.paimon.entity.WishVo;
 import com.example.paimon.util.GsonUtil;
+import com.example.paimon.util.Log;
 import com.example.paimon.util.SystemUtil;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,6 +73,31 @@ public class CommUtil {
             url.append(key).append("=").append(resultMap.get(key)).append("&");
         }
         return url.substring(0, url.length() - 2);
+    }
+
+    public void writeCacheFile(String content, String path) {
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(path);
+            fileOutputStream.write(content.getBytes(StandardCharsets.UTF_8));
+            fileOutputStream.flush();
+            fileOutputStream.close();
+        } catch (IOException e) {
+            Log.e(e);
+        }
+    }
+
+    public String readCacheFile(String path) {
+        StringBuilder content = new StringBuilder();
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                content.append(line);
+            }
+        } catch (IOException e) {
+            Log.e(e);
+        }
+        return content.toString();
     }
 
 }

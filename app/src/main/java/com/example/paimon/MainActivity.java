@@ -28,15 +28,9 @@ import com.example.paimon.util.Log;
 import com.example.paimon.util.StringUtil;
 import com.example.paimon.util.SystemUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
@@ -52,16 +46,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
             String data = msg.getData().getString("data");
+            String uid = msg.getData().getString("uid");
             List<WishVo> wishList = GsonUtil.jsonToList(data, WishVo.class);
             switch (msg.what) {
                 case 1: showDetail(wishList, "character");
                     Toast.makeText(MainActivity.this, "角色池加载完成", Toast.LENGTH_SHORT).show();
+                    CommUtil.getInstance().writeCacheFile(data, getResources().getString(R.string.cache_path) + uid + "-301.json");
                     break;
                 case 2: showDetail(wishList, "standard");
                     Toast.makeText(MainActivity.this, "常驻池加载完成", Toast.LENGTH_SHORT).show();
+                    CommUtil.getInstance().writeCacheFile(data, getResources().getString(R.string.cache_path) + uid + "-200.json");
                     break;
                 case 3: showDetail(wishList, "weapon");
                     Toast.makeText(MainActivity.this, "武器池加载完成", Toast.LENGTH_SHORT).show();
+                    CommUtil.getInstance().writeCacheFile(data, getResources().getString(R.string.cache_path) + uid + "-302.json");
                     break;
             }
         }
@@ -192,15 +190,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showCacheRecord(String uid, SharedPreferences cache) {
+        String prefix_path = getResources().getString(R.string.cache_path) + uid;
         // 角色池
         String character = cache.getString(uid + "-301", "[]");
-        showDetail(GsonUtil.jsonToList(character, WishVo.class), "character");
+        String character_cache = CommUtil.getInstance().readCacheFile(prefix_path + "-301.json");
+        showDetail(mixWishData(character, character_cache), "character");
         // 常驻池
         String standard = cache.getString(uid + "-200", "[]");
-        showDetail(GsonUtil.jsonToList(standard, WishVo.class), "standard");
+        String standard_cache = CommUtil.getInstance().readCacheFile(prefix_path + "-200.json");
+        showDetail(mixWishData(standard, standard_cache), "standard");
         // 武器池
         String weapon = cache.getString(uid + "-302", "[]");
-        showDetail(GsonUtil.jsonToList(weapon, WishVo.class), "weapon");
+        String weapon_cache = CommUtil.getInstance().readCacheFile(prefix_path + "-302.json");
+        showDetail(mixWishData(weapon, weapon_cache), "weapon");
+    }
+
+    private List<WishVo> mixWishData(String wish, String cache) {
+        List<WishVo> mixed = GsonUtil.jsonToList(wish, WishVo.class);
+        List<WishVo> cacheWish = GsonUtil.jsonToList(cache, WishVo.class);
+        mixed.addAll(cacheWish);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        TreeSet<WishVo> result = new TreeSet<>((o1, o2) -> {
+            try {
+                return dateFormat.parse(o1.getTime()).compareTo(dateFormat.parse(o2.getTime()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return 0;
+        });
+        result.addAll(mixed);
+        return new ArrayList<>(result);
     }
 
     private void doWish(String query, int what) {

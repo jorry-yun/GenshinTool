@@ -12,4 +12,5 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="title_activity_tip">TipActivity</string>
     <string name="query">查询</string>
+    <string name="cache_path">/GenshinTool/cache/</string>
 </resources>

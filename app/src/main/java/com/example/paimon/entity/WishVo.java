@@ -1,5 +1,7 @@
 package com.example.paimon.entity;
 
+import java.util.Objects;
+
 public class WishVo {
     private String count;
     private String uid;
@@ -90,5 +92,18 @@ public class WishVo {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WishVo wishVo = (WishVo) o;
+        return Objects.equals(id, wishVo.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
