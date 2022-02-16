@@ -46,20 +46,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
             String data = msg.getData().getString("data");
-            String uid = msg.getData().getString("uid");
+//            String uid = msg.getData().getString("uid");
             List<WishVo> wishList = GsonUtil.jsonToList(data, WishVo.class);
             switch (msg.what) {
                 case 1: showDetail(wishList, "character");
                     Toast.makeText(MainActivity.this, "角色池加载完成", Toast.LENGTH_SHORT).show();
-                    CommUtil.getInstance().writeCacheFile(data, getResources().getString(R.string.cache_path) + uid + "-301.json");
+//                    CommUtil.getInstance().writeCacheFile(MainActivity.this, data, getResources().getString(R.string.cache_path) + uid + "-301.json");
                     break;
                 case 2: showDetail(wishList, "standard");
                     Toast.makeText(MainActivity.this, "常驻池加载完成", Toast.LENGTH_SHORT).show();
-                    CommUtil.getInstance().writeCacheFile(data, getResources().getString(R.string.cache_path) + uid + "-200.json");
+//                    CommUtil.getInstance().writeCacheFile(MainActivity.this, data, getResources().getString(R.string.cache_path) + uid + "-200.json");
                     break;
                 case 3: showDetail(wishList, "weapon");
                     Toast.makeText(MainActivity.this, "武器池加载完成", Toast.LENGTH_SHORT).show();
-                    CommUtil.getInstance().writeCacheFile(data, getResources().getString(R.string.cache_path) + uid + "-302.json");
+//                    CommUtil.getInstance().writeCacheFile(MainActivity.this, data, getResources().getString(R.string.cache_path) + uid + "-302.json");
                     break;
             }
         }
@@ -86,9 +86,18 @@ public class MainActivity extends AppCompatActivity {
         // 监听按钮点击事件
         setOnClickListener(content, cache);
         List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
-        createAccount(cache, uids);
+        createAccount(uids);
         if (!uids.isEmpty()) {
-            showCacheRecord(uids.get(0), cache);
+            showCacheRecord(uids.get(0));
+        }
+        // 导出缓存
+        for (String uid : uids) {
+            for (String type : Arrays.asList("301", "302", "200")) {
+                String s = cache.getString(uid + "-" + type, "");
+                if (!"".equals(s)) {
+                    CommUtil.getInstance().writeCacheFile(this, s, uid + "-" + type + ".json");
+                }
+            }
         }
 
 //        TextView moni = findViewById(R.id.moni);
@@ -132,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
         tips.setOnClickListener((view) -> {
             Intent tipsIntent = new Intent(this, TipActivity.class);
             startActivity(tipsIntent);
-
         });
     }
 
@@ -158,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void createAccount(SharedPreferences cache, List<String> uids) {
+    private void createAccount(List<String> uids) {
         LinearLayout account = findViewById(R.id.account);
         account.removeAllViews();
         if (!uids.isEmpty()) {
@@ -175,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) accountText.getLayoutParams();
                     layoutParams.setMargins(0, SystemUtil.Dp2Px(this, -2), SystemUtil.Dp2Px(this, 15), SystemUtil.Dp2Px(this, 15));
                     accountText.setTextSize(SystemUtil.Dp2Px(this, 4.5f));
-                    accountText.setOnClickListener((view) -> showCacheRecord(((TextView) view).getText().toString(), cache));
+                    accountText.setOnClickListener((view) -> showCacheRecord(((TextView) view).getText().toString()));
                     line.addView(accountText);
                 }
                 account.addView(line);
@@ -190,20 +198,22 @@ public class MainActivity extends AppCompatActivity {
         return findViewById(id);
     }
 
-    private void showCacheRecord(String uid, SharedPreferences cache) {
-        String prefix_path = getResources().getString(R.string.cache_path) + uid;
+    private void showCacheRecord(String uid) {
         // 角色池
-        String character = cache.getString(uid + "-301", "[]");
-        String character_cache = CommUtil.getInstance().readCacheFile(prefix_path + "-301.json");
-        showDetail(mixWishData(character, character_cache), "character");
+//        String character = cache.getString(uid + "-301", "[]");
+        String character = CommUtil.getInstance().readCacheFile(this, uid + "-301.json", "[]");
+//        String character_cache = CommUtil.getInstance().readCacheFile(this, uid + "-301.json");
+        showDetail(GsonUtil.jsonToList(character, WishVo.class), "character");
         // 常驻池
-        String standard = cache.getString(uid + "-200", "[]");
-        String standard_cache = CommUtil.getInstance().readCacheFile(prefix_path + "-200.json");
-        showDetail(mixWishData(standard, standard_cache), "standard");
+        String standard = CommUtil.getInstance().readCacheFile(this, uid + "-200.json", "[]");
+//        String standard = cache.getString(uid + "-200", "[]");
+//        String standard_cache = CommUtil.getInstance().readCacheFile(this, uid + "-200.json");
+        showDetail(GsonUtil.jsonToList(standard, WishVo.class), "standard");
         // 武器池
-        String weapon = cache.getString(uid + "-302", "[]");
-        String weapon_cache = CommUtil.getInstance().readCacheFile(prefix_path + "-302.json");
-        showDetail(mixWishData(weapon, weapon_cache), "weapon");
+        String weapon = CommUtil.getInstance().readCacheFile(this, uid + "-302.json", "[]");
+//        String weapon = cache.getString(uid + "-302", "[]");
+//        String weapon_cache = CommUtil.getInstance().readCacheFile(this, uid + "-302.json");
+        showDetail(GsonUtil.jsonToList(weapon, WishVo.class), "weapon");
     }
 
     private List<WishVo> mixWishData(String wish, String cache) {
@@ -247,18 +257,21 @@ public class MainActivity extends AppCompatActivity {
             uids.add(uid);
         }
         cache.edit().putString("uid", GsonUtil.toJson(uids)).apply();
-        createAccount(cache, uids);
+        createAccount(uids);
         // 处理祈愿历史记录
-        String history = cache.getString(uid + "-" + type, "");
+//        String history = cache.getString(uid + "-" + type, "");
+        String history = CommUtil.getInstance().readCacheFile(this, uid + "-" + type + ".json", "[]");
         if (!history.isEmpty()) {
             List<WishVo> cachedWish = GsonUtil.jsonToList(history, WishVo.class);
             Set<String> ids = cachedWish.stream().map(WishVo::getId).collect(Collectors.toSet());
             wishList = wishList.stream().filter(wish -> !ids.contains(wish.getId())).collect(Collectors.toList());
             cachedWish.addAll(0, wishList);
-            cache.edit().putString(uid + "-" + type, GsonUtil.toJson(cachedWish)).apply();
+//            cache.edit().putString(uid + "-" + type, GsonUtil.toJson(cachedWish)).apply();
+            CommUtil.getInstance().writeCacheFile(this, GsonUtil.toJson(cachedWish), uid + "-" + type + ".json");
             return cachedWish;
         }
-        cache.edit().putString(uid + "-" + type, GsonUtil.toJson(wishList)).apply();
+//        cache.edit().putString(uid + "-" + type, GsonUtil.toJson(wishList)).apply();
+        CommUtil.getInstance().writeCacheFile(this, GsonUtil.toJson(wishList), uid + "-" + type + ".json");
         return wishList;
     }
 
@@ -290,6 +303,16 @@ public class MainActivity extends AppCompatActivity {
         SpannableStringBuilder fiveExpendStyle = new SpannableStringBuilder(five_avg);
         fiveExpendStyle.setSpan(new ForegroundColorSpan(Color.MAGENTA), 9, five_avg.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
         partFiveAvg.setText(fiveExpendStyle);
+        // 角色活动祈愿才有up五星的说法
+        if ("character".equals(prefix)) {
+            TextView partFiveAvgUp = findViewById(R.id.character_five_avg_up);
+            String five_avg_up = (String) result.get("five_avg_up");
+            partFiveAvgUp.setText(five_avg_up);
+            // up五星平均出货抽数样式
+            SpannableStringBuilder upFiveExpendStyle = new SpannableStringBuilder(five_avg);
+            upFiveExpendStyle.setSpan(new ForegroundColorSpan(Color.MAGENTA), 11, five_avg_up.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+            partFiveAvgUp.setText(upFiveExpendStyle);
+        }
         // 四星平均出货抽数样式
         SpannableStringBuilder fourExpendStyle = new SpannableStringBuilder(four_avg);
         fourExpendStyle.setSpan(new ForegroundColorSpan(Color.MAGENTA), 9, four_avg.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
@@ -372,6 +395,7 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, Object> analysis(List<WishVo> wishList) {
         Map<String, Object> result = new HashMap<>();
         result.put("total", wishList.size() + "");
+        Set<String> standardCharacter = new HashSet<>(Arrays.asList("迪卢克", "琴", "莫娜", "刻晴", "七七"));
         // 五星角色
         List<WishVo> fivePart = getCharacterSequence(wishList, 5);
         // 四星角色
@@ -393,8 +417,12 @@ public class MainActivity extends AppCompatActivity {
         result.put("three_num", "三星：" + (three == 0L ? "还未出蓝" : three));
         result.put("three_pro", "【 " + (wishList.size() == 0 ? "0": round(three * 1.0 / wishList.size())) + "% 】");
         // 五星平均出货抽数
-        Double five_avg = fivePart.stream().map(WishVo::getCount).map(Integer::parseInt).collect(Collectors.averagingInt((Integer::intValue)));
-        result.put("five_avg", "五星平均出货抽数：" + (five == 0L ? "还未出金" : round(five_avg / 100)));
+        IntSummaryStatistics five_total = fivePart.stream().map(WishVo::getCount).map(Integer::parseInt).collect(Collectors.summarizingInt(Integer::intValue));
+        Double five_avg = five_total.getAverage();
+        result.put("five_avg", "五星平均出货抽数：" + (five == 0L ? "还未出金" : round(five_total.getAverage() / 100)));
+        // up五星平均出货抽数
+        long up_five_num = fivePart.stream().filter(wishVo -> standardCharacter.contains(wishVo.getName())).count();
+        result.put("five_avg_up", "up五星平均出货抽数：" + (five == 0L ? "还未出金" : round(five_total.getSum() / up_five_num / 100)));
         // 四星平均出货抽数
         Double four_avg = fourPart.stream().map(WishVo::getCount).map(Integer::parseInt).collect(Collectors.averagingInt((Integer::intValue)));
         result.put("four_avg", "四星平均出货抽数：" + (four == 0L ? "还未出紫" : round( four_avg / 100)));

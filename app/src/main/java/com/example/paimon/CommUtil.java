@@ -1,6 +1,7 @@
 package com.example.paimon;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -75,9 +76,14 @@ public class CommUtil {
         return url.substring(0, url.length() - 2);
     }
 
-    public void writeCacheFile(String content, String path) {
+    public void writeCacheFile(Context context, String content, String fileName) {
+        String path = context.getResources().getString(R.string.cache_path);
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(path);
+            File file = new File(path + fileName);
+            if (file.exists()) {
+                file.delete();
+            }
+            FileOutputStream fileOutputStream = new FileOutputStream(path + fileName);
             fileOutputStream.write(content.getBytes(StandardCharsets.UTF_8));
             fileOutputStream.flush();
             fileOutputStream.close();
@@ -86,10 +92,11 @@ public class CommUtil {
         }
     }
 
-    public String readCacheFile(String path) {
+    public String readCacheFile(Context context, String fileName, String defaultValue) {
+        String path = context.getResources().getString(R.string.cache_path);
         StringBuilder content = new StringBuilder();
         try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + fileName)));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 content.append(line);
@@ -97,7 +104,8 @@ public class CommUtil {
         } catch (IOException e) {
             Log.e(e);
         }
-        return content.toString();
+        String s = content.toString();
+        return "".equals(s) ? defaultValue : s;
     }
 
 }

@@ -118,7 +118,7 @@
                     android:layout_marginEnd="20dp"
                     android:textColor="@color/black"
                     android:textSize="@dimen/default_font_size"
-                    android:text="角色活动祈愿"/>
+                    android:text="@string/character_title"/>
 
                 <TextView
                     android:id="@+id/character_overview"
@@ -127,7 +127,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="20dp"
                     android:textColor="@color/default_color"
-                    android:text="一共 0 抽，已累计 0 抽未出金，累计 0 抽未出紫"/>
+                    android:text="@string/overview"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -145,7 +145,7 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#D59432"
-                            android:text="五星："/>
+                            android:text="@string/five_level"/>
 
                         <TextView
                             android:id="@+id/character_four_num"
@@ -154,7 +154,7 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#A256E1"
-                            android:text="四星："/>
+                            android:text="@string/four_level"/>
 
                         <TextView
                             android:id="@+id/character_three_num"
@@ -163,7 +163,7 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#7396C2"
-                            android:text="三星："/>
+                            android:text="@string/three_level"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -224,7 +224,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:textColor="@color/default_color"
-                        android:text="五星出货顺序："/>
+                        android:text="@string/five_seq"/>
 
                     <LinearLayout
                         android:id="@+id/character_five_seq"
@@ -246,7 +246,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:textColor="@color/default_color"
-                        android:text="四星出货顺序："/>
+                        android:text="@string/four_seq"/>
 
                     <LinearLayout
                         android:id="@+id/character_four_seq"
@@ -264,7 +264,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:textColor="@color/default_color"
-                    android:text="五星平均出货抽数为："/>
+                    android:text="@string/five_avg"/>
+
+                <TextView
+                        android:id="@+id/character_five_avg_up"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/default_color"
+                        android:text="@string/five_avg_up"/>
 
                 <TextView
                     android:id="@+id/character_four_avg"
@@ -273,7 +281,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="20dp"
                     android:textColor="@color/default_color"
-                    android:text="四星平均出货抽数为："/>
+                    android:text="@string/four_avg"/>
             </LinearLayout>
 
             <!-- 常驻祈愿 -->
@@ -291,7 +299,7 @@
                     android:layout_marginEnd="20dp"
                     android:textColor="@color/black"
                     android:textSize="@dimen/default_font_size"
-                    android:text="常驻祈愿"/>
+                    android:text="@string/standard_title"/>
 
                 <TextView
                     android:id="@+id/standard_overview"
@@ -300,7 +308,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="20dp"
                     android:textColor="@color/default_color"
-                    android:text="一共 0 抽，已累计 0 抽未出金，累计 0 抽未出紫"/>
+                    android:text="@string/overview"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -318,7 +326,7 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#D59432"
-                            android:text="五星："/>
+                            android:text="@string/five_level"/>
 
                         <TextView
                             android:id="@+id/standard_four_num"
@@ -327,7 +335,7 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#A256E1"
-                            android:text="四星："/>
+                            android:text="@string/four_level"/>
 
                         <TextView
                             android:id="@+id/standard_three_num"
@@ -336,7 +344,7 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#7396C2"
-                            android:text="三星："/>
+                            android:text="@string/three_level"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -386,7 +394,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:textColor="@color/default_color"
-                        android:text="五星出货顺序："/>
+                        android:text="@string/five_seq"/>
 
                     <LinearLayout
                         android:id="@+id/standard_five_seq"
@@ -408,7 +416,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:textColor="@color/default_color"
-                        android:text="四星出货顺序："/>
+                        android:text="@string/four_seq"/>
 
                     <LinearLayout
                         android:id="@+id/standard_four_seq"
@@ -426,7 +434,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:textColor="@color/default_color"
-                    android:text="五星平均出货抽数为："/>
+                    android:text="@string/five_avg"/>
 
                 <TextView
                     android:id="@+id/standard_four_avg"
@@ -435,7 +443,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="20dp"
                     android:textColor="@color/default_color"
-                    android:text="四星平均出货抽数为："/>
+                    android:text="@string/four_avg"/>
             </LinearLayout>
 
             <!-- 武器祈愿 -->
@@ -453,7 +461,7 @@
                     android:layout_marginEnd="20dp"
                     android:textColor="@color/black"
                     android:textSize="@dimen/default_font_size"
-                    android:text="武器活动祈愿"/>
+                    android:text="@string/weapon_title"/>
 
                 <TextView
                     android:id="@+id/weapon_overview"
@@ -462,7 +470,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="20dp"
                     android:textColor="@color/default_color"
-                    android:text="一共 0 抽，已累计 0 抽未出金，累计 0 抽未出紫"/>
+                    android:text="@string/overview"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -480,7 +488,7 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#D59432"
-                            android:text="五星："/>
+                            android:text="@string/five_level"/>
 
                         <TextView
                             android:id="@+id/weapon_four_num"
@@ -489,7 +497,7 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#A256E1"
-                            android:text="四星："/>
+                            android:text="@string/four_level"/>
 
                         <TextView
                             android:id="@+id/weapon_three_num"
@@ -498,7 +506,7 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#7396C2"
-                            android:text="三星："/>
+                            android:text="@string/three_level"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -548,7 +556,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:textColor="@color/default_color"
-                        android:text="五星出货顺序："/>
+                        android:text="@string/five_seq"/>
 
                     <LinearLayout
                         android:id="@+id/weapon_five_seq"
@@ -570,7 +578,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:textColor="@color/default_color"
-                        android:text="四星出货顺序："/>
+                        android:text="@string/four_seq"/>
 
                     <LinearLayout
                         android:id="@+id/weapon_four_seq"
@@ -588,7 +596,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:textColor="@color/default_color"
-                    android:text="五星平均出货抽数为："/>
+                    android:text="@string/five_avg"/>
 
                 <TextView
                     android:id="@+id/weapon_four_avg"
@@ -597,7 +605,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="20dp"
                     android:textColor="@color/default_color"
-                    android:text="四星平均出货抽数为："/>
+                    android:text="@string/four_avg"/>
             </LinearLayout>
         </LinearLayout>
 

@@ -13,4 +13,16 @@
     <string name="title_activity_tip">TipActivity</string>
     <string name="query">查询</string>
     <string name="cache_path">/GenshinTool/cache/</string>
+    <string name="character_title">角色活动祈愿</string>
+    <string name="standard_title">常驻祈愿</string>
+    <string name="weapon_title">武器活动祈愿</string>
+    <string name="overview">一共 0 抽，已累计 0 抽未出金，累计 0 抽未出紫</string>
+    <string name="five_level">五星：</string>
+    <string name="four_level">四星：</string>
+    <string name="three_level">三星：</string>
+    <string name="five_seq">五星出货顺序：</string>
+    <string name="four_seq">四星出货顺序：</string>
+    <string name="five_avg">五星平均出货抽数为：</string>
+    <string name="five_avg_up">up五星平均出货抽数为：</string>
+    <string name="four_avg">四星平均出货抽数为：</string>
 </resources>
