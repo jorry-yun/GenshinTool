@@ -144,6 +144,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void changeElementHideOrShow(String id) {
+        LinearLayout element = findViewById(id);
+        if (element.getVisibility() == View.INVISIBLE) {
+            element.setVisibility(View.VISIBLE);
+        } else {
+            element.setVisibility(View.INVISIBLE);
+        }
+    }
+
     private void setOnClickListener(EditText content, SharedPreferences cache) {
         TextView button = findViewById(R.id.button);
         button.setOnClickListener((view) -> {
@@ -163,6 +172,16 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 showDialog("请输入抽卡记录链接！");
             }
+        });
+        // 切换四星抽卡顺序的显示与隐藏
+        findViewById(R.id.character_four_seq_text).setOnClickListener((view) -> {
+            changeElementHideOrShow("character_four_seq");
+        });
+        findViewById(R.id.standard_four_seq_text).setOnClickListener((view) -> {
+            changeElementHideOrShow("standard_four_seq");
+        });
+        findViewById(R.id.weapon_four_seq_text).setOnClickListener((view) -> {
+            changeElementHideOrShow("weapon_four_seq");
         });
     }
 
