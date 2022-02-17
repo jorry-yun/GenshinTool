@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.view.ViewGroup;
@@ -79,10 +80,16 @@ public class CommUtil {
     public void writeCacheFile(Context context, String content, String fileName) {
         String path = context.getResources().getString(R.string.cache_path);
         try {
+            path = getFileRoot(context) + path;
+            File dir = new File(path);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
             File file = new File(path + fileName);
             if (file.exists()) {
                 file.delete();
             }
+            file.createNewFile();
             FileOutputStream fileOutputStream = new FileOutputStream(path + fileName);
             fileOutputStream.write(content.getBytes(StandardCharsets.UTF_8));
             fileOutputStream.flush();
@@ -96,6 +103,11 @@ public class CommUtil {
         String path = context.getResources().getString(R.string.cache_path);
         StringBuilder content = new StringBuilder();
         try {
+            path = getFileRoot(context) + path;
+            File dir = new File(path);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + fileName)));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
@@ -108,4 +120,14 @@ public class CommUtil {
         return "".equals(s) ? defaultValue : s;
     }
 
+    private static String getFileRoot(Context context) {
+        if (Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) {
+            File external = context.getExternalFilesDir(null);
+            if (external != null) {
+                return external.getAbsolutePath();
+            }
+        }
+        return context.getFilesDir().getAbsolutePath();
+    }
 }

@@ -1,8 +1,10 @@
 package com.example.paimon;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -35,6 +37,8 @@ import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -90,15 +94,26 @@ public class MainActivity extends AppCompatActivity {
         if (!uids.isEmpty()) {
             showCacheRecord(uids.get(0));
         }
-        // 导出缓存
-        for (String uid : uids) {
-            for (String type : Arrays.asList("301", "302", "200")) {
-                String s = cache.getString(uid + "-" + type, "");
-                if (!"".equals(s)) {
-                    CommUtil.getInstance().writeCacheFile(this, s, uid + "-" + type + ".json");
-                }
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1024);
             }
         }
+//         导出缓存
+//        for (String uid : uids) {
+//            for (String type : Arrays.asList("301", "302", "200")) {
+//                String s = cache.getString(uid + "-" + type, "");
+//                if (!"".equals(s)) {
+//                    CommUtil.getInstance().writeCacheFile(this, s, uid + "-" + type + ".json");
+//                }
+//            }
+//        }
 
 //        TextView moni = findViewById(R.id.moni);
 //        moni.setOnClickListener((view) -> {
@@ -157,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
         TextView button = findViewById(R.id.button);
         button.setOnClickListener((view) -> {
             String url = content.getText().toString();
+            url = url.substring(url.indexOf("https:"), url.indexOf("#/log") + 5);
             if (url.length() != 0) {
                 Map<String, String> resultMap = CommUtil.getInstance().parseUrl(url);
                 String authKey = resultMap.get("authkey");
@@ -295,6 +311,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showDetail(List<WishVo> wishVo, String prefix) {
+        if (wishVo.isEmpty()) {
+            return;
+        }
         Map<String, Object> result = analysis(wishVo);
         TextView partOverview = findViewById(prefix + "_overview");
         TextView partFiveNum = findViewById(prefix + "_five_num");
@@ -328,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
             String five_avg_up = (String) result.get("five_avg_up");
             partFiveAvgUp.setText(five_avg_up);
             // up五星平均出货抽数样式
-            SpannableStringBuilder upFiveExpendStyle = new SpannableStringBuilder(five_avg);
+            SpannableStringBuilder upFiveExpendStyle = new SpannableStringBuilder(five_avg_up);
             upFiveExpendStyle.setSpan(new ForegroundColorSpan(Color.MAGENTA), 11, five_avg_up.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
             partFiveAvgUp.setText(upFiveExpendStyle);
         }
@@ -440,8 +459,8 @@ public class MainActivity extends AppCompatActivity {
         Double five_avg = five_total.getAverage();
         result.put("five_avg", "五星平均出货抽数：" + (five == 0L ? "还未出金" : round(five_total.getAverage() / 100)));
         // up五星平均出货抽数
-        long up_five_num = fivePart.stream().filter(wishVo -> standardCharacter.contains(wishVo.getName())).count();
-        result.put("five_avg_up", "up五星平均出货抽数：" + (five == 0L ? "还未出金" : round(five_total.getSum() / up_five_num / 100)));
+        long up_five_num = fivePart.stream().filter(wishVo -> !standardCharacter.contains(wishVo.getName())).count();
+        result.put("five_avg_up", "up五星平均出货抽数：" + (five == 0L || up_five_num == 0L ? "还未出up五星" : round(five_total.getSum() / up_five_num * 1.0 / 100)));
         // 四星平均出货抽数
         Double four_avg = fourPart.stream().map(WishVo::getCount).map(Integer::parseInt).collect(Collectors.averagingInt((Integer::intValue)));
         result.put("four_avg", "四星平均出货抽数：" + (four == 0L ? "还未出紫" : round( four_avg / 100)));
