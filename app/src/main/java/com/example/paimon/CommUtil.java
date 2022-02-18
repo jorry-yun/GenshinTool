@@ -13,16 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.paimon.entity.WishVo;
-import com.example.paimon.util.GsonUtil;
-import com.example.paimon.util.Log;
-import com.example.paimon.util.SystemUtil;
+import com.example.paimon.util.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CommUtil {
 
@@ -129,5 +124,31 @@ public class CommUtil {
             }
         }
         return context.getFilesDir().getAbsolutePath();
+    }
+
+    public int getCharacterColor(Map<String, String> data, String name) {
+        Map<String, Integer> colorMap = new HashMap<>();
+        colorMap.put("风", R.color.feng);
+        colorMap.put("风", R.color.feng);
+        colorMap.put("风", R.color.feng);
+        colorMap.put("风", R.color.feng);
+        colorMap.put("风", R.color.feng);
+        colorMap.put("风", R.color.feng);
+        return 0;
+    }
+
+    public String readConfig() {
+        String url = "https://raw.githubusercontent.com/jorry-yun/GenshinTool/master/app/src/main/res/values/character";
+        new HttpUtil().get(url, new HttpCallBack<Map<String, String>>() {
+            @Override
+            public void onSuccess(Map<String, String> map) {
+
+            }
+
+            @Override
+            public void onFailure(String message) {
+
+            }
+        });
     }
 }

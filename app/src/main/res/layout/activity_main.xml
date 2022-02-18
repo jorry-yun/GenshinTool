@@ -90,8 +90,17 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/black"
-                        android:layout_marginEnd="20dp"
                         android:text="切换账号"/>
+
+                <ImageView
+                        android:id="@+id/account_question"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_question"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginTop="1dp">
+
+                </ImageView>
 
                 <LinearLayout
                         android:id="@+id/account"

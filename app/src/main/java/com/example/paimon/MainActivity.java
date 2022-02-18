@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
 
     private final String WISH_URL_TEMPLATE = "https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?%s&page=%s&size=20&end_id=%s";
 
+    private final String CHARACTER_STYLE_URL = "https://raw.githubusercontent.com/jorry-yun/GenshinTool/master/app/src/main/res/values/character";
+
     private Handler handler1 = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -88,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         String cacheUrl = cache.getString("content", "");
         content.setText(cacheUrl);
         // 监听按钮点击事件
-        setOnClickListener(content, cache);
+        setOnClickListener(content.getText().toString(), cache);
         List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
         createAccount(uids);
         if (!uids.isEmpty()) {
@@ -106,14 +108,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 //         导出缓存
-//        for (String uid : uids) {
-//            for (String type : Arrays.asList("301", "302", "200")) {
-//                String s = cache.getString(uid + "-" + type, "");
-//                if (!"".equals(s)) {
-//                    CommUtil.getInstance().writeCacheFile(this, s, uid + "-" + type + ".json");
-//                }
-//            }
-//        }
+        for (String uid : uids) {
+            if (!"191234778".equals(uid)) {
+                continue;
+            }
+            for (String type : Arrays.asList("301", "302", "200")) {
+                String s = cache.getString(uid + "-" + type, "");
+                if (!"".equals(s)) {
+                    CommUtil.getInstance().writeCacheFile(this, s, uid + "-" + type + ".json");
+                }
+            }
+        }
 
 //        TextView moni = findViewById(R.id.moni);
 //        moni.setOnClickListener((view) -> {
@@ -159,20 +164,40 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void changeElementHideOrShow(String id) {
-        LinearLayout element = findViewById(id);
-        if (element.getVisibility() == View.INVISIBLE) {
-            element.setVisibility(View.VISIBLE);
-        } else {
-            element.setVisibility(View.INVISIBLE);
+    private boolean accountToTop(String account) {
+        SharedPreferences cache = getSharedPreferences(CACHE_NAME, MODE_PRIVATE);
+        List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
+        if (uids.contains(account)) {
+            uids.remove(account);
+            uids.add(0, account);
+            cache.edit().putString("uid", GsonUtil.toJson(uids)).apply();
+            createAccount(uids);
         }
+        return true;
     }
 
-    private void setOnClickListener(EditText content, SharedPreferences cache) {
+    private void changeElementHideOrShow(String id) {
+        LinearLayout element = findViewById(id);
+//        if (element.getVisibility() == View.INVISIBLE) {
+//            element.setVisibility(View.VISIBLE);
+//        } else {
+//            element.setVisibility(View.INVISIBLE);
+//        }
+        element.removeAllViews();
+    }
+
+    private void setOnClickListener(String content, SharedPreferences cache) {
         TextView button = findViewById(R.id.button);
         button.setOnClickListener((view) -> {
-            String url = content.getText().toString();
-            url = url.substring(url.indexOf("https:"), url.indexOf("#/log") + 5);
+            // 从粘贴的字符串中找出URL链接
+            int beginIndex = content.indexOf("https://webstatic.mihoyo.com");
+            int endIndex = content.indexOf("#/log");
+            if (beginIndex == -1 || endIndex == -1 || beginIndex >= endIndex) {
+                Toast.makeText(this, "输入的链接有误，请检查", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // 裁剪
+            String url = content.substring(beginIndex, endIndex + 5);
             if (url.length() != 0) {
                 Map<String, String> resultMap = CommUtil.getInstance().parseUrl(url);
                 String authKey = resultMap.get("authkey");
@@ -199,13 +224,16 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.weapon_four_seq_text).setOnClickListener((view) -> {
             changeElementHideOrShow("weapon_four_seq");
         });
+        findViewById(R.id.account_question).setOnClickListener((view) -> {
+            showDialog("长按账号可将其置顶，下次进来app将首先展示该账号信息");
+        });
     }
 
     private void createAccount(List<String> uids) {
         LinearLayout account = findViewById(R.id.account);
         account.removeAllViews();
         if (!uids.isEmpty()) {
-            for (List<String> list : CommUtil.getInstance().splitList(uids, 3)) {
+            for (List<String> list : CommUtil.getInstance().splitList(uids, 4)) {
                 // 一行
                 LinearLayout line = new LinearLayout(MainActivity.this);
                 LinearLayout.LayoutParams lLayoutParams = new LinearLayout.LayoutParams(
@@ -219,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
                     layoutParams.setMargins(0, SystemUtil.Dp2Px(this, -2), SystemUtil.Dp2Px(this, 15), SystemUtil.Dp2Px(this, 15));
                     accountText.setTextSize(SystemUtil.Dp2Px(this, 4.5f));
                     accountText.setOnClickListener((view) -> showCacheRecord(((TextView) view).getText().toString()));
+                    accountText.setOnLongClickListener((view) -> accountToTop(((TextView) view).getText().toString()));
                     line.addView(accountText);
                 }
                 account.addView(line);
@@ -249,23 +278,6 @@ public class MainActivity extends AppCompatActivity {
 //        String weapon = cache.getString(uid + "-302", "[]");
 //        String weapon_cache = CommUtil.getInstance().readCacheFile(this, uid + "-302.json");
         showDetail(GsonUtil.jsonToList(weapon, WishVo.class), "weapon");
-    }
-
-    private List<WishVo> mixWishData(String wish, String cache) {
-        List<WishVo> mixed = GsonUtil.jsonToList(wish, WishVo.class);
-        List<WishVo> cacheWish = GsonUtil.jsonToList(cache, WishVo.class);
-        mixed.addAll(cacheWish);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        TreeSet<WishVo> result = new TreeSet<>((o1, o2) -> {
-            try {
-                return dateFormat.parse(o1.getTime()).compareTo(dateFormat.parse(o2.getTime()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            return 0;
-        });
-        result.addAll(mixed);
-        return new ArrayList<>(result);
     }
 
     private void doWish(String query, int what) {
