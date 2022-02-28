@@ -129,26 +129,12 @@ public class CommUtil {
     public int getCharacterColor(Map<String, String> data, String name) {
         Map<String, Integer> colorMap = new HashMap<>();
         colorMap.put("风", R.color.feng);
-        colorMap.put("风", R.color.feng);
-        colorMap.put("风", R.color.feng);
-        colorMap.put("风", R.color.feng);
-        colorMap.put("风", R.color.feng);
-        colorMap.put("风", R.color.feng);
+        colorMap.put("火", R.color.huo);
+        colorMap.put("冰", R.color.bing);
+        colorMap.put("水", R.color.shui);
+        colorMap.put("雷", R.color.lei);
+        colorMap.put("岩", R.color.yan);
         return 0;
     }
 
-    public String readConfig() {
-        String url = "https://raw.githubusercontent.com/jorry-yun/GenshinTool/master/app/src/main/res/values/character";
-        new HttpUtil().get(url, new HttpCallBack<Map<String, String>>() {
-            @Override
-            public void onSuccess(Map<String, String> map) {
-
-            }
-
-            @Override
-            public void onFailure(String message) {
-
-            }
-        });
-    }
 }

@@ -25,4 +25,5 @@
     <string name="five_avg">五星平均出货抽数为：</string>
     <string name="five_avg_up">up五星平均出货抽数为：</string>
     <string name="four_avg">四星平均出货抽数为：</string>
+    <string name="show_four_sequence"><u>已隐藏，点击展开</u></string>
 </resources>

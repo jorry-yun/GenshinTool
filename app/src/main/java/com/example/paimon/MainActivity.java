@@ -13,6 +13,7 @@ import android.os.Message;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -47,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private final String WISH_URL_TEMPLATE = "https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?%s&page=%s&size=20&end_id=%s";
 
     private final String CHARACTER_STYLE_URL = "https://raw.githubusercontent.com/jorry-yun/GenshinTool/master/app/src/main/res/values/character";
+
+    private String currentAccount = null;
 
     private Handler handler1 = new Handler() {
         @Override
@@ -90,13 +93,13 @@ public class MainActivity extends AppCompatActivity {
         String cacheUrl = cache.getString("content", "");
         content.setText(cacheUrl);
         // 监听按钮点击事件
-        setOnClickListener(content.getText().toString(), cache);
+        setOnClickListener(content, cache);
         List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
         createAccount(uids);
         if (!uids.isEmpty()) {
             showCacheRecord(uids.get(0));
         }
-
+        // 申请存储权限
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -108,60 +111,24 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 //         导出缓存
-        for (String uid : uids) {
-            if (!"191234778".equals(uid)) {
-                continue;
-            }
-            for (String type : Arrays.asList("301", "302", "200")) {
-                String s = cache.getString(uid + "-" + type, "");
-                if (!"".equals(s)) {
-                    CommUtil.getInstance().writeCacheFile(this, s, uid + "-" + type + ".json");
-                }
-            }
-        }
-
-//        TextView moni = findViewById(R.id.moni);
-//        moni.setOnClickListener((view) -> {
-//            List<WishVo> data = new ArrayList<>();
-//            int j = 0;
-//            for (int i = 0; i < 150; i++) {
-//                WishVo vo = new WishVo();
-//                vo.setId("-1");
-//                vo.setName("模拟数据");
-//                vo.setUid("100049717");
-//                j++;
-//                if (j < 9) {
-//                    if ((int)(Math.random() * 100) + 1 <= 5) {
-//                        vo.setRank_type("4");
-//                        j = 0;
-//                    }
-//                }
-//                if (j == 9) {
-//                    if ((int)(Math.random() * 100) + 1 <= 36) {
-//                        vo.setRank_type("4");
-//                        j = 0;
-//                    }
-//                }
-//                if (i == 0 || j == 10) {
-//                    vo.setRank_type("4");
-//                    j = 0;
-//                }
-//                if (i == 74) {
-//                    vo.setName("");
-//                    vo.setRank_type("5");
-//                }
-//                data.add(vo);
+//        for (String uid : uids) {
+//            if (!"191234778".equals(uid)) {
+//                continue;
 //            }
-//            cache.edit().putString("100049717-301", GsonUtil.toJson(data)).apply();
-//            Toast.makeText(this, "模拟数据生成成功", Toast.LENGTH_SHORT).show();
-//        });
-
+//            for (String type : Arrays.asList("301", "302", "200")) {
+//                String s = cache.getString(uid + "-" + type, "");
+//                if (!"".equals(s)) {
+//                    CommUtil.getInstance().writeCacheFile(this, s, uid + "-" + type + ".json");
+//                }
+//            }
+//        }
         // 页面跳转
         TextView tips = findViewById(R.id.tips);
         tips.setOnClickListener((view) -> {
             Intent tipsIntent = new Intent(this, TipActivity.class);
             startActivity(tipsIntent);
         });
+        CharacterStyle.pullConfig(this);
     }
 
     private boolean accountToTop(String account) {
@@ -176,19 +143,28 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void changeElementHideOrShow(String id) {
-        LinearLayout element = findViewById(id);
-//        if (element.getVisibility() == View.INVISIBLE) {
-//            element.setVisibility(View.VISIBLE);
-//        } else {
-//            element.setVisibility(View.INVISIBLE);
-//        }
-        element.removeAllViews();
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
     }
 
-    private void setOnClickListener(String content, SharedPreferences cache) {
+    private void changeElementHideOrShow(String type, String code, String id) {
+        LinearLayout element = findViewById(id);
+        element.removeAllViews();
+        String showStr = getResources().getString(R.string.show_four_sequence);
+        TextView textView = generateTextView(R.color.blue, showStr);
+        element.addView(textView);
+        textView.setOnClickListener((view) -> {
+            String character = CommUtil.getInstance().readCacheFile(this, currentAccount + "-" + code + ".json", "[]");
+            showDetail(GsonUtil.jsonToList(character, WishVo.class), type);
+        });
+    }
+
+    private void setOnClickListener(TextView contentView, SharedPreferences cache) {
         TextView button = findViewById(R.id.button);
         button.setOnClickListener((view) -> {
+            String content = contentView.getText().toString();
             // 从粘贴的字符串中找出URL链接
             int beginIndex = content.indexOf("https://webstatic.mihoyo.com");
             int endIndex = content.indexOf("#/log");
@@ -216,13 +192,13 @@ public class MainActivity extends AppCompatActivity {
         });
         // 切换四星抽卡顺序的显示与隐藏
         findViewById(R.id.character_four_seq_text).setOnClickListener((view) -> {
-            changeElementHideOrShow("character_four_seq");
+            changeElementHideOrShow("character", "301", "character_four_seq");
         });
         findViewById(R.id.standard_four_seq_text).setOnClickListener((view) -> {
-            changeElementHideOrShow("standard_four_seq");
+            changeElementHideOrShow("standard", "200", "standard_four_seq");
         });
         findViewById(R.id.weapon_four_seq_text).setOnClickListener((view) -> {
-            changeElementHideOrShow("weapon_four_seq");
+            changeElementHideOrShow("weapon", "302", "weapon_four_seq");
         });
         findViewById(R.id.account_question).setOnClickListener((view) -> {
             showDialog("长按账号可将其置顶，下次进来app将首先展示该账号信息");
@@ -243,15 +219,18 @@ public class MainActivity extends AppCompatActivity {
                 line.setLayoutParams(lLayoutParams);
                 for (String No :list) {
                     TextView accountText = generateTextView(R.color.blue, No);
+                    accountText.setId(R.id.spline);
                     LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) accountText.getLayoutParams();
-                    layoutParams.setMargins(0, SystemUtil.Dp2Px(this, -2), SystemUtil.Dp2Px(this, 15), SystemUtil.Dp2Px(this, 15));
+//                    layoutParams.setMargins(0, SystemUtil.Dp2Px(this, -2), SystemUtil.Dp2Px(this, 15), SystemUtil.Dp2Px(this, 15));
                     accountText.setTextSize(SystemUtil.Dp2Px(this, 4.5f));
                     accountText.setOnClickListener((view) -> showCacheRecord(((TextView) view).getText().toString()));
                     accountText.setOnLongClickListener((view) -> accountToTop(((TextView) view).getText().toString()));
                     line.addView(accountText);
+//                    break;
                 }
                 account.addView(line);
-            }
+//                break;
+        }
         } else {
              account.addView(generateTextView(R.color.black, "暂无账号可切换"));
         }
@@ -263,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showCacheRecord(String uid) {
+        currentAccount = uid;
         // 角色池
 //        String character = cache.getString(uid + "-301", "[]");
         String character = CommUtil.getInstance().readCacheFile(this, uid + "-301.json", "[]");
@@ -468,7 +448,6 @@ public class MainActivity extends AppCompatActivity {
         result.put("three_pro", "【 " + (wishList.size() == 0 ? "0": round(three * 1.0 / wishList.size())) + "% 】");
         // 五星平均出货抽数
         IntSummaryStatistics five_total = fivePart.stream().map(WishVo::getCount).map(Integer::parseInt).collect(Collectors.summarizingInt(Integer::intValue));
-        Double five_avg = five_total.getAverage();
         result.put("five_avg", "五星平均出货抽数：" + (five == 0L ? "还未出金" : round(five_total.getAverage() / 100)));
         // up五星平均出货抽数
         long up_five_num = fivePart.stream().filter(wishVo -> !standardCharacter.contains(wishVo.getName())).count();

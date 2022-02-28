@@ -1,5 +1,9 @@
 package com.example.paimon.util;
 
+import android.content.Context;
+
+import com.example.paimon.CommUtil;
+import com.example.paimon.MainActivity;
 import com.example.paimon.R;
 
 import java.util.HashMap;
@@ -59,7 +63,52 @@ public class CharacterStyle {
         map.put("丽莎", R.color.lei);
     }
 
+    public static void pullConfig(Context context) {
+        String url = "https://files.cnblogs.com/files/blogs/682374/character-style.json";
+        new HttpUtil().get(url, Map.class, new HttpCallBack<Map>() {
+            @Override
+            public void onSuccess(Map map) {
+                CharacterStyle.map.putAll(convertMap(map));
+                String content = GsonUtil.toJson(CharacterStyle.map);
+                CommUtil.getInstance().writeCacheFile(context, content, "character-style.json");
+            }
+
+            @Override
+            public void onFailure(String message) {
+                Log.d(message);
+            }
+        });
+        String content = CommUtil.getInstance().readCacheFile(context, "character-style.json", "{}");
+        map.putAll(convertMap(GsonUtil.parseJson(content, Map.class)));
+    }
+
     public static Integer get(String name) {
         return map.get(name);
+    }
+
+    private static Integer getColor(String name) {
+        switch (name) {
+            case "风": return R.color.feng;
+            case "岩": return R.color.yan;
+            case "冰": return R.color.bing;
+            case "火": return R.color.huo;
+            case "水": return R.color.shui;
+            case "雷": return R.color.lei;
+        }
+        return null;
+    }
+
+    private static Map<String, Integer> convertMap(Map map) {
+        Map<String, Object> request = new HashMap<>(map);
+        Map<String, Integer> result = new HashMap<>();
+        for (Map.Entry<String, Object> entry : request.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Integer || value instanceof Double) {
+                result.put(entry.getKey(), ((Number) value).intValue());
+            } else {
+                result.put(entry.getKey(), getColor((String) entry.getValue()));
+            }
+        }
+        return result;
     }
 }
