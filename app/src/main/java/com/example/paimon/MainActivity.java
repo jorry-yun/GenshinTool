@@ -47,28 +47,22 @@ public class MainActivity extends AppCompatActivity {
 
     private final String WISH_URL_TEMPLATE = "https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?%s&page=%s&size=20&end_id=%s";
 
-    private final String CHARACTER_STYLE_URL = "https://raw.githubusercontent.com/jorry-yun/GenshinTool/master/app/src/main/res/values/character";
-
     private String currentAccount = null;
 
     private Handler handler1 = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             String data = msg.getData().getString("data");
-//            String uid = msg.getData().getString("uid");
             List<WishVo> wishList = GsonUtil.jsonToList(data, WishVo.class);
             switch (msg.what) {
                 case 1: showDetail(wishList, "character");
                     Toast.makeText(MainActivity.this, "角色池加载完成", Toast.LENGTH_SHORT).show();
-//                    CommUtil.getInstance().writeCacheFile(MainActivity.this, data, getResources().getString(R.string.cache_path) + uid + "-301.json");
                     break;
                 case 2: showDetail(wishList, "standard");
                     Toast.makeText(MainActivity.this, "常驻池加载完成", Toast.LENGTH_SHORT).show();
-//                    CommUtil.getInstance().writeCacheFile(MainActivity.this, data, getResources().getString(R.string.cache_path) + uid + "-200.json");
                     break;
                 case 3: showDetail(wishList, "weapon");
                     Toast.makeText(MainActivity.this, "武器池加载完成", Toast.LENGTH_SHORT).show();
-//                    CommUtil.getInstance().writeCacheFile(MainActivity.this, data, getResources().getString(R.string.cache_path) + uid + "-302.json");
                     break;
             }
         }
@@ -110,18 +104,6 @@ public class MainActivity extends AppCompatActivity {
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1024);
             }
         }
-//         导出缓存
-//        for (String uid : uids) {
-//            if (!"191234778".equals(uid)) {
-//                continue;
-//            }
-//            for (String type : Arrays.asList("301", "302", "200")) {
-//                String s = cache.getString(uid + "-" + type, "");
-//                if (!"".equals(s)) {
-//                    CommUtil.getInstance().writeCacheFile(this, s, uid + "-" + type + ".json");
-//                }
-//            }
-//        }
         // 页面跳转
         TextView tips = findViewById(R.id.tips);
         tips.setOnClickListener((view) -> {
@@ -221,15 +203,13 @@ public class MainActivity extends AppCompatActivity {
                     TextView accountText = generateTextView(R.color.blue, No);
                     accountText.setId(R.id.spline);
                     LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) accountText.getLayoutParams();
-//                    layoutParams.setMargins(0, SystemUtil.Dp2Px(this, -2), SystemUtil.Dp2Px(this, 15), SystemUtil.Dp2Px(this, 15));
+                    layoutParams.setMargins(0, SystemUtil.Dp2Px(this, -2), SystemUtil.Dp2Px(this, 15), SystemUtil.Dp2Px(this, 15));
                     accountText.setTextSize(SystemUtil.Dp2Px(this, 4.5f));
                     accountText.setOnClickListener((view) -> showCacheRecord(((TextView) view).getText().toString()));
                     accountText.setOnLongClickListener((view) -> accountToTop(((TextView) view).getText().toString()));
                     line.addView(accountText);
-//                    break;
                 }
                 account.addView(line);
-//                break;
         }
         } else {
              account.addView(generateTextView(R.color.black, "暂无账号可切换"));
@@ -244,19 +224,13 @@ public class MainActivity extends AppCompatActivity {
     private void showCacheRecord(String uid) {
         currentAccount = uid;
         // 角色池
-//        String character = cache.getString(uid + "-301", "[]");
         String character = CommUtil.getInstance().readCacheFile(this, uid + "-301.json", "[]");
-//        String character_cache = CommUtil.getInstance().readCacheFile(this, uid + "-301.json");
         showDetail(GsonUtil.jsonToList(character, WishVo.class), "character");
         // 常驻池
         String standard = CommUtil.getInstance().readCacheFile(this, uid + "-200.json", "[]");
-//        String standard = cache.getString(uid + "-200", "[]");
-//        String standard_cache = CommUtil.getInstance().readCacheFile(this, uid + "-200.json");
         showDetail(GsonUtil.jsonToList(standard, WishVo.class), "standard");
         // 武器池
         String weapon = CommUtil.getInstance().readCacheFile(this, uid + "-302.json", "[]");
-//        String weapon = cache.getString(uid + "-302", "[]");
-//        String weapon_cache = CommUtil.getInstance().readCacheFile(this, uid + "-302.json");
         showDetail(GsonUtil.jsonToList(weapon, WishVo.class), "weapon");
     }
 
@@ -286,18 +260,15 @@ public class MainActivity extends AppCompatActivity {
         cache.edit().putString("uid", GsonUtil.toJson(uids)).apply();
         createAccount(uids);
         // 处理祈愿历史记录
-//        String history = cache.getString(uid + "-" + type, "");
         String history = CommUtil.getInstance().readCacheFile(this, uid + "-" + type + ".json", "[]");
         if (!history.isEmpty()) {
             List<WishVo> cachedWish = GsonUtil.jsonToList(history, WishVo.class);
             Set<String> ids = cachedWish.stream().map(WishVo::getId).collect(Collectors.toSet());
             wishList = wishList.stream().filter(wish -> !ids.contains(wish.getId())).collect(Collectors.toList());
             cachedWish.addAll(0, wishList);
-//            cache.edit().putString(uid + "-" + type, GsonUtil.toJson(cachedWish)).apply();
             CommUtil.getInstance().writeCacheFile(this, GsonUtil.toJson(cachedWish), uid + "-" + type + ".json");
             return cachedWish;
         }
-//        cache.edit().putString(uid + "-" + type, GsonUtil.toJson(wishList)).apply();
         CommUtil.getInstance().writeCacheFile(this, GsonUtil.toJson(wishList), uid + "-" + type + ".json");
         return wishList;
     }
