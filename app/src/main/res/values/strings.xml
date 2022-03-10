@@ -8,11 +8,17 @@
     <string name="previous">Previous</string>
     <string name="tips"><u>如何复制历史记录链接？</u></string>
 
+    <string name="url_character_style">https://files.cnblogs.com/files/blogs/682374/character-style.json</string>
+    <string name="url_wish_template">https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?%s&amp;page=%s&amp;size=20&amp;end_id=%s</string>
+    <string name="url_app_update_msg">https://files.cnblogs.com/files/blogs/682374/app-update-msg.json</string>
+
+
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="title_activity_tip">TipActivity</string>
     <string name="query">查询</string>
     <string name="cache_path">/GenshinTool/cache/</string>
+    <string name="apk_path">/GenshinTool/apk/</string>
     <string name="character_title">角色活动祈愿</string>
     <string name="standard_title">常驻祈愿</string>
     <string name="weapon_title">武器活动祈愿</string>
@@ -26,4 +32,5 @@
     <string name="five_avg_up">up五星平均出货抽数为：</string>
     <string name="four_avg">四星平均出货抽数为：</string>
     <string name="show_four_sequence"><u>已隐藏，点击展开</u></string>
+    <string name="check_new_version"><u>检查新版本</u></string>
 </resources>

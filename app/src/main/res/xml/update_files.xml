@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <paths>
+        <!--<external-path name="camera_out_file" path="TQImageSelector/CameraImage/" />-->
+        <external-files-path
+            name="camera_out_file"
+            path="Pictures/" />
+
+        <external-path
+            name="rc_external_path"
+            path="." />
+
+        <external-path
+            name="my_images"
+            path="Android/data/xxxx.FileProvider/files/Pictures" />
+
+        <root-path
+            name="rc_root_path"
+            path="" />
+    </paths>
+</resources>

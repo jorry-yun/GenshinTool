@@ -1,8 +1,11 @@
 package com.example.paimon;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -43,13 +46,9 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String CACHE_NAME = "paimon";
-
-    private final String WISH_URL_TEMPLATE = "https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?%s&page=%s&size=20&end_id=%s";
-
     private String currentAccount = null;
 
-    private Handler handler1 = new Handler() {
+    private final Handler handler1 = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             String data = msg.getData().getString("data");
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private Handler handler2 = new Handler() {
+    private final Handler handler2 = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             if (msg.what == 0) {
@@ -83,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         EditText content = findViewById(R.id.content);
         // 读取缓存
-        SharedPreferences cache = getSharedPreferences(CACHE_NAME, MODE_PRIVATE);
+        SharedPreferences cache = CommUtil.getInstance().getSharedPreferences(this);
         String cacheUrl = cache.getString("content", "");
         content.setText(cacheUrl);
         // 监听按钮点击事件
@@ -110,11 +109,14 @@ public class MainActivity extends AppCompatActivity {
             Intent tipsIntent = new Intent(this, TipActivity.class);
             startActivity(tipsIntent);
         });
+        // 获取最新角色配置信息
         CharacterStyle.pullConfig(this);
+        // 检查更新
+        CommUtil.getInstance().checkUpdate(this, true);
     }
 
     private boolean accountToTop(String account) {
-        SharedPreferences cache = getSharedPreferences(CACHE_NAME, MODE_PRIVATE);
+        SharedPreferences cache = CommUtil.getInstance().getSharedPreferences(this);
         List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
         if (uids.contains(account)) {
             uids.remove(account);
@@ -128,14 +130,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-
     }
 
     private void changeElementHideOrShow(String type, String code, String id) {
         LinearLayout element = findViewById(id);
         element.removeAllViews();
         String showStr = getResources().getString(R.string.show_four_sequence);
-        TextView textView = generateTextView(R.color.blue, showStr);
+        TextView textView = CommUtil.getInstance().generateTextView(this, R.color.blue, showStr);
         element.addView(textView);
         textView.setOnClickListener((view) -> {
             String character = CommUtil.getInstance().readCacheFile(this, currentAccount + "-" + code + ".json", "[]");
@@ -166,10 +167,10 @@ public class MainActivity extends AppCompatActivity {
                     String urlQuery = CommUtil.getInstance().toUrl(resultMap);
                     CommUtil.getInstance().sendMessage(0, urlQuery + "&gacha_type=", handler2);
                 } else {
-                    showDialog("输入的链接有误，请检查");
+                    CommUtil.getInstance().showDialog(MainActivity.this, "输入的链接有误，请检查");
                 }
             } else {
-                showDialog("请输入抽卡记录链接！");
+                CommUtil.getInstance(). showDialog(MainActivity.this, "请输入抽卡记录链接！");
             }
         });
         // 切换四星抽卡顺序的显示与隐藏
@@ -183,7 +184,12 @@ public class MainActivity extends AppCompatActivity {
             changeElementHideOrShow("weapon", "302", "weapon_four_seq");
         });
         findViewById(R.id.account_question).setOnClickListener((view) -> {
-            showDialog("长按账号可将其置顶，下次进来app将首先展示该账号信息");
+            CommUtil.getInstance().showDialog(this, "长按账号可将其置顶，下次进来app将首先展示该账号信息");
+        });
+        findViewById(R.id.update).setOnClickListener((view) -> {
+            // 响应之前不允许再次点击
+            view.setClickable(false);
+            CommUtil.getInstance().checkUpdate(MainActivity.this, false);
         });
     }
 
@@ -200,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
                 lLayoutParams.setLayoutDirection(LinearLayout.HORIZONTAL);
                 line.setLayoutParams(lLayoutParams);
                 for (String No :list) {
-                    TextView accountText = generateTextView(R.color.blue, No);
+                    TextView accountText = CommUtil.getInstance().generateTextView(this, R.color.blue, No);
                     accountText.setId(R.id.spline);
                     LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) accountText.getLayoutParams();
                     layoutParams.setMargins(0, SystemUtil.Dp2Px(this, -2), SystemUtil.Dp2Px(this, 15), SystemUtil.Dp2Px(this, 15));
@@ -210,9 +216,9 @@ public class MainActivity extends AppCompatActivity {
                     line.addView(accountText);
                 }
                 account.addView(line);
-        }
+            }
         } else {
-             account.addView(generateTextView(R.color.black, "暂无账号可切换"));
+             account.addView(CommUtil.getInstance().generateNormalTextView(this, null, "暂无账号可切换"));
         }
     }
 
@@ -252,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
         }
         String uid = wishList.get(0).getUid();
         // 处理uid
-        SharedPreferences cache = getSharedPreferences(CACHE_NAME, MODE_PRIVATE);
+        SharedPreferences cache = CommUtil.getInstance().getSharedPreferences(this);
         List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
         if (!uids.contains(uid)) {
             uids.add(uid);
@@ -341,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
         int limit = 36;
         LinearLayout line = null;
         if (wishList.isEmpty()) {
-            content.addView(generateTextView(R.color.purple_200, "还未出" + color));
+            content.addView(CommUtil.getInstance().generateTextView(this, R.color.purple_200, "还未出" + color));
         }
         content.removeAllViews();
         for (WishVo wishVo : wishList) {
@@ -373,24 +379,9 @@ public class MainActivity extends AppCompatActivity {
                 colorId = colorId == null ? R.color.default_color : colorId;
             }
             // 将EditText放到LinearLayout里
-            line.addView(generateTextView(colorId, wishVo.getName() + "(" + wishVo.getCount() + ")"));
+            line.addView(CommUtil.getInstance().generateTextView(this, colorId, wishVo.getName() + "(" + wishVo.getCount() + ")"));
             limit = limit < 0 ? 36 - length : limit;
         }
-    }
-
-    private TextView generateTextView(int color, String text) {
-        // 单个角色
-        TextView textView = new TextView(MainActivity.this);
-        LinearLayout.LayoutParams etParam = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        etParam.setMargins(0, SystemUtil.Dp2Px(this, 10), SystemUtil.Dp2Px(this, 6), 0);
-        textView.setLayoutParams(etParam);
-        // 设置属性
-        Resources resources = getBaseContext().getResources();
-        textView.setTextColor(resources.getColor(color));
-        textView.setText(text);
-        return textView;
     }
 
     private Map<String, Object> analysis(List<WishVo> wishList) {
@@ -483,7 +474,9 @@ public class MainActivity extends AppCompatActivity {
         doRequest(0, "0", urlQuery, new ArrayList<>(), 100, handler);
     }
 
+    @SuppressLint("StringFormatMatches")
     private void doRequest(int page, String endId, String urlQuery, List<WishVo> wishList, int interval, RequestHandler handler) {
+        String WISH_URL_TEMPLATE = getResources().getString(R.string.url_wish_template);
         String url = String.format(WISH_URL_TEMPLATE, urlQuery, page, endId);
         new HttpUtil().get(url, RequestResult.class, new HttpCallBack<RequestResult>() {
             @Override
@@ -501,7 +494,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     } else {
                         if ("authkey timeout".equals(result.getMessage())) {
-                            showDialog("链接已失效，请重新从游戏中复制");
+                            CommUtil.getInstance().showDialog(MainActivity.this, "链接已失效，请重新从游戏中复制");
                         }
                         // 如果系统报请求频繁，则将每次请求时间间隔+100ms重新请求
                         if ("visit too frequently".equals(result.getMessage())) {
@@ -521,11 +514,4 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showDialog(String message) {
-        new AlertDialog.Builder(this)
-                .setTitle("提示").setMessage(message)
-                .setIcon(R.mipmap.favicon)
-                .setPositiveButton("确定", (dialog, which) -> {})
-                .create().show();
-    }
 }

@@ -64,7 +64,7 @@ public class CharacterStyle {
     }
 
     public static void pullConfig(Context context) {
-        String url = "https://files.cnblogs.com/files/blogs/682374/character-style.json";
+        String url = context.getResources().getString(R.string.url_character_style);
         new HttpUtil().get(url, Map.class, new HttpCallBack<Map>() {
             @Override
             public void onSuccess(Map map) {
