@@ -187,7 +187,7 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#D59432"
-                            android:text="【  】"/>
+                            android:text="@string/empty_probability"/>
 
                         <TextView
                             android:id="@+id/character_four_pro"
@@ -197,7 +197,7 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#A256E1"
-                            android:text="【  】"/>
+                            android:text="@string/empty_probability"/>
 
                         <TextView
                             android:id="@+id/character_three_pro"
@@ -207,7 +207,7 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#7396C2"
-                            android:text="【  】"/>
+                            android:text="@string/empty_probability"/>
                     </LinearLayout>
 
 <!--                    <LinearLayout-->
@@ -369,7 +369,7 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#D59432"
-                            android:text="【  】"/>
+                            android:text="@string/empty_probability"/>
 
                         <TextView
                             android:id="@+id/standard_four_pro"
@@ -379,7 +379,7 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#A256E1"
-                            android:text="【  】"/>
+                            android:text="@string/empty_probability"/>
 
                         <TextView
                             android:id="@+id/standard_three_pro"
@@ -389,7 +389,7 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#7396C2"
-                            android:text="【  】"/>
+                            android:text="@string/empty_probability"/>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -532,7 +532,7 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#D59432"
-                            android:text="【  】"/>
+                            android:text="@string/empty_probability"/>
 
                         <TextView
                             android:id="@+id/weapon_four_pro"
@@ -542,7 +542,7 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#A256E1"
-                            android:text="【  】"/>
+                            android:text="@string/empty_probability"/>
 
                         <TextView
                             android:id="@+id/weapon_three_pro"
@@ -552,7 +552,7 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginEnd="20dp"
                             android:textColor="#7396C2"
-                            android:text="【  】"/>
+                            android:text="@string/empty_probability"/>
                     </LinearLayout>
 
                 </LinearLayout>

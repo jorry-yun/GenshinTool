@@ -236,7 +236,7 @@ public class CommUtil {
                         // 忽略更新的版本号
                         cache.edit().putString("ignore", currentVersion).apply();
                     }).show();
-                } else {
+                } else if (!autoIgnore){
                     Toast.makeText(context, "已是最新版本", Toast.LENGTH_SHORT).show();
                 }
             }

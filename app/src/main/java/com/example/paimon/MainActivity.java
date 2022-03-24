@@ -48,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
 
     private String currentAccount = null;
 
+    // 是否海外版
+    private boolean sea = false;
+
     private final Handler handler1 = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -150,6 +153,10 @@ public class MainActivity extends AppCompatActivity {
             String content = contentView.getText().toString();
             // 从粘贴的字符串中找出URL链接
             int beginIndex = content.indexOf("https://webstatic.mihoyo.com");
+            sea = beginIndex == -1;
+            if (beginIndex == -1) {
+                beginIndex = content.indexOf("https://webstatic-sea.mihoyo.com");
+            }
             int endIndex = content.indexOf("#/log");
             if (beginIndex == -1 || endIndex == -1 || beginIndex >= endIndex) {
                 Toast.makeText(this, "输入的链接有误，请检查", Toast.LENGTH_SHORT).show();
@@ -280,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showDetail(List<WishVo> wishVo, String prefix) {
+        clearDetail(prefix);
         if (wishVo.isEmpty()) {
             return;
         }
@@ -328,6 +336,31 @@ public class MainActivity extends AppCompatActivity {
         addSequence((List<WishVo>) result.get("five_seq"), findViewById(prefix + "_five_seq"), "金");
         // 设置四星出货顺序
         addSequence((List<WishVo>) result.get("four_seq"), findViewById(prefix + "_four_seq"), "紫");
+    }
+
+    private void clearDetail(String prefix) {
+        TextView overview = findViewById(prefix + "_overview");
+        TextView fiveNum = findViewById(prefix + "_five_num");
+        TextView fourNum = findViewById(prefix + "_four_num");
+        TextView threeNum = findViewById(prefix + "_three_num");
+        TextView fivePro = findViewById(prefix + "_five_pro");
+        TextView fourPro = findViewById(prefix + "_four_pro");
+        TextView threePro = findViewById(prefix + "_three_pro");
+        TextView fiveAvg = findViewById(prefix + "_five_avg");
+        TextView fourAvg = findViewById(prefix + "_four_avg");
+        LinearLayout fiveSeq = findViewById(prefix + "_five_seq");
+        LinearLayout fourSeq = findViewById(prefix + "_four_seq");
+        overview.setText(getResources().getString(R.string.overview));
+        fiveNum.setText(getResources().getString(R.string.five_level));
+        fourNum.setText(getResources().getString(R.string.four_level));
+        threeNum.setText(getResources().getString(R.string.three_level));
+        fivePro.setText(getResources().getString(R.string.empty_probability));
+        fourPro.setText(getResources().getString(R.string.empty_probability));
+        threePro.setText(getResources().getString(R.string.empty_probability));
+        fiveAvg.setText(getResources().getString(R.string.five_avg));
+        fourAvg.setText(getResources().getString(R.string.four_avg));
+        fiveSeq.removeAllViews();
+        fourSeq.removeAllViews();
     }
 
     private SpannableStringBuilder getOverviewStyle(List<WishVo> wishVo, String overview) {
@@ -477,6 +510,9 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("StringFormatMatches")
     private void doRequest(int page, String endId, String urlQuery, List<WishVo> wishList, int interval, RequestHandler handler) {
         String WISH_URL_TEMPLATE = getResources().getString(R.string.url_wish_template);
+        if (sea) {
+            WISH_URL_TEMPLATE = getResources().getString(R.string.url_wish_sea_template);
+        }
         String url = String.format(WISH_URL_TEMPLATE, urlQuery, page, endId);
         new HttpUtil().get(url, RequestResult.class, new HttpCallBack<RequestResult>() {
             @Override
