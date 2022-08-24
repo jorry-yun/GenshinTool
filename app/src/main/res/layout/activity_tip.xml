@@ -15,6 +15,22 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/big_font_size"
+            android:layout_marginTop="20dp"
+            android:textColor="#F00"
+            android:text="由于抽卡界面改版，以下方法已不适用！！！"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/big_font_size"
+            android:layout_marginTop="20dp"
+            android:textColor="#F00"
+            android:text="后续找到新的方法将更新上来，敬请关注"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textSize="@dimen/default_font_size"
             android:layout_marginTop="20dp"
             android:textColor="@color/black"

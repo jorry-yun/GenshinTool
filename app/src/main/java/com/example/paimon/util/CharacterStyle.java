@@ -94,6 +94,7 @@ public class CharacterStyle {
             case "火": return R.color.huo;
             case "水": return R.color.shui;
             case "雷": return R.color.lei;
+            case "草": return R.color.cao;
         }
         return null;
     }

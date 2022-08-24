@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
             int beginIndex = content.indexOf("https://webstatic.mihoyo.com");
             sea = beginIndex == -1;
             if (beginIndex == -1) {
-                beginIndex = content.indexOf("https://webstatic-sea.mihoyo.com");
+                beginIndex = content.indexOf("https://webstatic-sea.hoyoverse.com");
             }
             int endIndex = content.indexOf("#/log");
             if (beginIndex == -1 || endIndex == -1 || beginIndex >= endIndex) {
