@@ -25,6 +25,14 @@
             android:orientation="vertical">
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:gravity="center"
+                android:textSize="@dimen/bigger_font_size"
+                android:text="原神抽卡分析"/>
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
@@ -619,6 +627,15 @@
                     android:textColor="@color/default_color"
                     android:text="@string/four_avg"/>
             </LinearLayout>
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textColor="@color/blue"-->
+<!--                android:textSize="@dimen/small_font_size"-->
+<!--                android:layout_marginStart="10dp"-->
+<!--                android:layout_marginBottom="20dp"-->
+<!--                android:text="@string/imitate_wish"/>-->
 
             <LinearLayout
                 android:layout_width="match_parent"

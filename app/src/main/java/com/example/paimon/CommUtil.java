@@ -293,7 +293,7 @@ public class CommUtil {
     public void showDialog(Context context, String message) {
         new AlertDialog.Builder(context)
                 .setTitle("提示").setMessage(message)
-                .setIcon(R.mipmap.favicon)
+                .setIcon(R.mipmap.launcher)
                 .setPositiveButton("确定", (dialog, which) -> {})
                 .create().show();
     }
