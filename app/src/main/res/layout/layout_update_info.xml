@@ -104,6 +104,22 @@
 
         </LinearLayout>
 
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="15dp"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textColor="#F00"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="温馨提示：下载完成后请到文件管理中找到安装包自行安装"/>
+        </LinearLayout>
+
     </LinearLayout>
 
 
