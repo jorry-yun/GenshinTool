@@ -17,7 +17,9 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="title_activity_tip">TipActivity</string>
+    <string name="title_activity_cookie">CookieActivity</string>
     <string name="query">查询</string>
+    <string name="generate">获取抽卡链接</string>
     <string name="cache_path">/GenshinTool/cache/</string>
     <string name="apk_path">/GenshinTool/apk/</string>
     <string name="character_title">角色活动祈愿</string>

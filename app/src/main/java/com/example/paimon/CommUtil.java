@@ -3,6 +3,8 @@ package com.example.paimon;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -111,19 +113,28 @@ public class CommUtil {
     public String readCacheFile(Context context, String fileName, String defaultValue) {
         String path = context.getResources().getString(R.string.cache_path);
         StringBuilder content = new StringBuilder();
+        BufferedReader bufferedReader = null;
         try {
             path = getFileRoot(context) + path;
             File dir = new File(path);
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + fileName)));
+            bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + fileName)));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 content.append(line);
             }
         } catch (IOException e) {
             Log.e(e);
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         String s = content.toString();
         return "".equals(s) ? defaultValue : s;
@@ -296,6 +307,33 @@ public class CommUtil {
                 .setIcon(R.mipmap.launcher)
                 .setPositiveButton("确定", (dialog, which) -> {})
                 .create().show();
+    }
+
+    /**
+     * 复制内容到剪切板
+     *
+     * @param copyStr
+     * @return
+     */
+    public boolean copyStr(Context context, String copyStr) {
+        try {
+            //获取剪贴板管理器
+            ClipboardManager cm = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            // 创建普通字符型ClipData
+            ClipData mClipData = ClipData.newPlainText("Label", copyStr);
+            // 将ClipData内容放到系统剪贴板里。
+            cm.setPrimaryClip(mClipData);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getString(String str, String defaultValue) {
+        if (StringUtil.isNotBlank(str)) {
+            return str;
+        }
+        return defaultValue;
     }
 
 }

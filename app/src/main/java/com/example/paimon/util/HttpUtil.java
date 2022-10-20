@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import androidx.annotation.NonNull;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -89,6 +90,10 @@ public class HttpUtil {
      */
     public <T> void get(String url, Class<T> cls, HttpCallBack<T> callBack) {
         commonGet(getRequestForGet(url, null, null), cls, callBack);
+    }
+
+    public <T> void get(String url, Class<T> cls, Map<String, String> headers, HttpCallBack<T> callBack) {
+        commonGet(getRequestForGet(url, null, null, headers), cls, callBack);
     }
 
     /**
@@ -292,27 +297,23 @@ public class HttpUtil {
     }
 
     private Request getRequestForGet(String url, Map<String, String> params, Object tag) {
+        return getRequestForGet(url, params, tag, null);
+    }
+
+    private Request getRequestForGet(String url, Map<String, String> params, Object tag, Map<String, String> headers) {
         if (url == null || "".equals(url)) {
             Log.e(StringUtil.TAG, "HttpUtil----getRequestForGet()---->" + "url地址为空 无法执行网络请求!!!");
             return null;
         }
-//        if (url.contains("?")) {
-//            url += "&key=" + authKey;
-//        }else {
-//            url += "?key=" + authKey;
-//        }
-        Request request;
+        Request.Builder builder = new Request.Builder()
+                .url(paramsToString(url, params));
         if (tag != null) {
-            request = new Request.Builder()
-                    .url(paramsToString(url, params))
-                    .tag(tag)
-                    .build();
-        } else {
-            request = new Request.Builder()
-                    .url(paramsToString(url, params))
-                    .build();
+            builder = builder.tag(tag);
         }
-        return request;
+        if (headers != null) {
+            builder.headers(Headers.of(headers));
+        }
+        return builder.build();
     }
 
     private String paramsToString(String url, Map<String, String> params) {

@@ -2,13 +2,9 @@ package com.example.paimon;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.DownloadManager;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,7 +12,6 @@ import android.os.Message;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -26,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.paimon.entity.RequestResult;
 import com.example.paimon.entity.WishVo;
+import com.example.paimon.util.AuthKeyUtil;
 import com.example.paimon.util.CharacterStyle;
 import com.example.paimon.util.GsonUtil;
 import com.example.paimon.util.HttpCallBack;
@@ -34,8 +30,6 @@ import com.example.paimon.util.Log;
 import com.example.paimon.util.StringUtil;
 import com.example.paimon.util.SystemUtil;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,13 +51,13 @@ public class MainActivity extends AppCompatActivity {
             String data = msg.getData().getString("data");
             List<WishVo> wishList = GsonUtil.jsonToList(data, WishVo.class);
             switch (msg.what) {
-                case 1: showDetail(wishList, "character");
+                case 1: showDetail(wishList, "character", "301");
                     Toast.makeText(MainActivity.this, "角色池加载完成", Toast.LENGTH_SHORT).show();
                     break;
-                case 2: showDetail(wishList, "standard");
+                case 2: showDetail(wishList, "standard", "200");
                     Toast.makeText(MainActivity.this, "常驻池加载完成", Toast.LENGTH_SHORT).show();
                     break;
-                case 3: showDetail(wishList, "weapon");
+                case 3: showDetail(wishList, "weapon", "302");
                     Toast.makeText(MainActivity.this, "武器池加载完成", Toast.LENGTH_SHORT).show();
                     break;
             }
@@ -109,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         // 页面跳转
         TextView tips = findViewById(R.id.tips);
         tips.setOnClickListener((view) -> {
-            Intent tipsIntent = new Intent(this, TipActivity.class);
+            Intent tipsIntent = new Intent(this, CookieActivity.class);
             startActivity(tipsIntent);
         });
         // 获取最新角色配置信息
@@ -135,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         super.onWindowFocusChanged(hasFocus);
     }
 
-    private void changeElementHideOrShow(String type, String code, String id) {
+    private void changeElementHideOrShow(String prefix, String code, String id) {
         LinearLayout element = findViewById(id);
         element.removeAllViews();
         String showStr = getResources().getString(R.string.show_four_sequence);
@@ -143,7 +137,9 @@ public class MainActivity extends AppCompatActivity {
         element.addView(textView);
         textView.setOnClickListener((view) -> {
             String character = CommUtil.getInstance().readCacheFile(this, currentAccount + "-" + code + ".json", "[]");
-            showDetail(GsonUtil.jsonToList(character, WishVo.class), type);
+            List<WishVo> wishVos = GsonUtil.jsonToList(character, WishVo.class);
+            Map<String, Object> result = analysis(wishVos);
+            addSequence((List<WishVo>) result.get("four_seq"), findViewById(prefix + "_four_seq"), "紫");
         });
     }
 
@@ -238,13 +234,13 @@ public class MainActivity extends AppCompatActivity {
         currentAccount = uid;
         // 角色池
         String character = CommUtil.getInstance().readCacheFile(this, uid + "-301.json", "[]");
-        showDetail(GsonUtil.jsonToList(character, WishVo.class), "character");
+        showDetail(GsonUtil.jsonToList(character, WishVo.class), "character", "301");
         // 常驻池
         String standard = CommUtil.getInstance().readCacheFile(this, uid + "-200.json", "[]");
-        showDetail(GsonUtil.jsonToList(standard, WishVo.class), "standard");
+        showDetail(GsonUtil.jsonToList(standard, WishVo.class), "standard", "200");
         // 武器池
         String weapon = CommUtil.getInstance().readCacheFile(this, uid + "-302.json", "[]");
-        showDetail(GsonUtil.jsonToList(weapon, WishVo.class), "weapon");
+        showDetail(GsonUtil.jsonToList(weapon, WishVo.class), "weapon", "302");
     }
 
     private void doWish(String query, int what) {
@@ -286,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
         return wishList;
     }
 
-    public void showDetail(List<WishVo> wishVo, String prefix) {
+    public void showDetail(List<WishVo> wishVo, String prefix, String code) {
         clearDetail(prefix);
         if (wishVo.isEmpty()) {
             return;
@@ -335,7 +331,16 @@ public class MainActivity extends AppCompatActivity {
         // 设置五星出货顺序
         addSequence((List<WishVo>) result.get("five_seq"), findViewById(prefix + "_five_seq"), "金");
         // 设置四星出货顺序
-        addSequence((List<WishVo>) result.get("four_seq"), findViewById(prefix + "_four_seq"), "紫");
+//        addSequence((List<WishVo>) result.get("four_seq"), findViewById(prefix + "_four_seq"), "紫");
+        LinearLayout element = findViewById(prefix + "_four_seq");
+        String showStr = getResources().getString(R.string.show_four_sequence);
+        TextView textView = CommUtil.getInstance().generateTextView(this, R.color.blue, showStr);
+        element.addView(textView);
+        textView.setOnClickListener((view) -> {
+//            String character = CommUtil.getInstance().readCacheFile(this, currentAccount + "-" + code + ".json", "[]");
+//            showDetail(GsonUtil.jsonToList(character, WishVo.class), prefix, code);
+            addSequence((List<WishVo>) result.get("four_seq"), findViewById(prefix + "_four_seq"), "紫");
+        });
     }
 
     private void clearDetail(String prefix) {
@@ -377,21 +382,22 @@ public class MainActivity extends AppCompatActivity {
 
     private void addSequence(List<WishVo> wishList, LinearLayout content, String color) {
         // 一行能放字数极限
-        int limit = 36;
+        int limit = 32;
         LinearLayout line = null;
         if (wishList.isEmpty()) {
             content.addView(CommUtil.getInstance().generateTextView(this, R.color.purple_200, "还未出" + color));
         }
         content.removeAllViews();
+        int remain = limit;
         for (WishVo wishVo : wishList) {
             // 四星模拟数据跳过
             if ("紫".equals(color) && "-1".equals(wishVo.getId())) {
                 continue;
             }
-            // 一行剩余升放的字数
-            int length = wishVo.getName().length() * 2 + wishVo.getCount().length() + 2;
-            limit -= length;
-            if (line == null || limit < 0) {
+            // 一行剩余能放的字数（+2：两个括号，+1：空格）
+            int length = wishVo.getName().length() * 2 + wishVo.getCount().length() + 2 + 1;
+            remain -= length;
+            if (line == null || remain < 0) {
                 line = new LinearLayout(MainActivity.this);
                 LinearLayout.LayoutParams lLayoutParams = new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -413,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
             }
             // 将EditText放到LinearLayout里
             line.addView(CommUtil.getInstance().generateTextView(this, colorId, wishVo.getName() + "(" + wishVo.getCount() + ")"));
-            limit = limit < 0 ? 36 - length : limit;
+            remain = remain < 0 ? limit - length : remain;
         }
     }
 

@@ -3,6 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.paimon">
 
+    <permission android:name="android.permission.INSTALL_PACKAGES" />
+    <permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        tools:ignore="ManifestOrder" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:requestLegacyExternalStorage="true" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/launcher"
@@ -10,9 +21,15 @@
         android:roundIcon="@mipmap/launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Paimon">
-        <activity android:name=".WishSimulatorActivity"
-            android:screenOrientation="landscape"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".CookieActivity"
+            android:label="@string/title_activity_cookie"
+            android:theme="@style/Theme.Paimon.NoActionBar" />
+        <activity
+            android:name=".WishSimulatorActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".TipActivity"
             android:label="@string/title_activity_tip"
@@ -39,18 +56,7 @@
                 android:resource="@xml/update_files" />
         </provider>
 
-        <receiver android:name=".DownloadReceiver"></receiver>
+        <receiver android:name=".DownloadReceiver" />
     </application>
-    <permission android:name="android.permission.INSTALL_PACKAGES" />
-    <permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
-
-    <uses-permission
-        android:name="android.permission.INTERNET"
-        tools:ignore="ManifestOrder" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:requestLegacyExternalStorage="true" />
-
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 </manifest>
