@@ -7,6 +7,8 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.webkit.CookieManager;
+import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -46,13 +48,20 @@ public class CookieActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cookie);
-        EditText cookieEdit = findViewById(R.id.activity_cookie_content);
+        WebView myWebView = findViewById(R.id.webview);
+        myWebView.getSettings().setJavaScriptEnabled(true);
+        myWebView.getSettings().setDomStorageEnabled(true);
+        myWebView.loadUrl("https://user.mihoyo.com");
+//        EditText cookieEdit = findViewById(R.id.activity_cookie_content);
         findViewById(R.id.activity_cookie_generate).setOnClickListener((view) -> {
-            String cookie = cookieEdit.getText().toString();
-            if (StringUtil.isBlank(cookie)) {
-                Toast.makeText(this, "请粘贴cookie", Toast.LENGTH_SHORT).show();
-                return;
-            }
+//            String cookie = cookieEdit.getText().toString();
+            CookieManager instance = CookieManager.getInstance();
+            String cookie = instance.getCookie("https://user.mihoyo.com");
+//            HttpUtil.getAuthKey(cookie, handle)
+//            if (StringUtil.isBlank(cookie)) {
+//                Toast.makeText(this, "请粘贴cookie", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
             AuthKeyUtil.getInstance().getAuthkey(cookie, handler3);
         });
     }

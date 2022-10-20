@@ -6,7 +6,8 @@
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-    <string name="tips"><u>如何复制历史记录链接？</u></string>
+    <string name="tips"><u>前往获取抽卡链接</u></string>
+    <string name="title_tips">请在下方输入框中粘贴<u>祈愿历史记录链接</u></string>
 
     <string name="url_character_style">https://files.cnblogs.com/files/blogs/682374/character-style.json</string>
     <string name="url_wish_template">https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?%s&amp;page=%s&amp;size=20&amp;end_id=%s</string>

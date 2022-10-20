@@ -32,12 +32,13 @@
                 android:text="原神抽卡分析"/>
 
             <TextView
+                android:id="@+id/activity_main_title_tip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:textColor="@color/black"
                 android:layout_marginTop="10dp"
-                android:text="请在下方输入框中粘贴祈愿历史记录链接"/>
+                android:text="@string/title_tips"/>
 
             <EditText
                 android:id="@+id/content"

@@ -16,7 +16,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:theme="@style/Theme.Paimon.AppBarOverlay"
             android:paddingTop="10dp"
             android:paddingStart="10dp"
@@ -25,42 +25,36 @@
             android:orientation="vertical">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textColor="@color/black"
-                android:layout_marginTop="10dp"
-                android:text="请在下方输入框中粘贴从米游社复制的cookie"/>
-
-            <EditText
-                android:id="@+id/activity_cookie_content"
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="20dp"
-                android:textColorHint="#888888"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/default_font_size"
+                android:textAlignment="center"
                 android:textColor="@color/black"
-                android:hint="请粘贴cookie"
-                android:background="@drawable/bg_dialog_input"/>
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:text="下方登录米游社"/>
 
-            <TextView
+
+            <WebView
+                android:id="@+id/webview"
+                android:layout_width="match_parent"
+                android:layout_marginHorizontal="30dp"
+                android:layout_height="500dp" />
+
+            <Button
                 android:id="@+id/activity_cookie_generate"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
                 android:textAlignment="center"
                 android:gravity="center_vertical"
-                android:textSize="@dimen/default_font_size"
+                android:textSize="15sp"
                 android:textColor="@color/white"
                 android:text="@string/generate"
-                android:background="@drawable/bg_button_press"
+                android:background="@color/cao"
                 tools:ignore="RtlCompat"
                 android:clickable="true"
                 android:focusable="true" />

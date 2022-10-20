@@ -101,11 +101,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         // 页面跳转
-        TextView tips = findViewById(R.id.tips);
-        tips.setOnClickListener((view) -> {
+        findViewById(R.id.tips).setOnClickListener((view) -> {
             Intent tipsIntent = new Intent(this, CookieActivity.class);
             startActivity(tipsIntent);
         });
+        findViewById(R.id.activity_main_title_tip).setOnClickListener((view) -> {
+            Intent tipsIntent = new Intent(this, CookieActivity.class);
+            startActivity(tipsIntent);
+        });
+
         // 获取最新角色配置信息
         CharacterStyle.pullConfig(this);
         // 检查更新
