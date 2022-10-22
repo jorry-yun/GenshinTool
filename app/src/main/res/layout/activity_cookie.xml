@@ -41,11 +41,26 @@
                 android:layout_marginHorizontal="30dp"
                 android:layout_height="500dp" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="end">
+
+                <TextView
+                    android:id="@+id/activity_cookie_copy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/blue"
+                    android:text="复制cookie"/>
+
+            </LinearLayout>
+
             <Button
                 android:id="@+id/activity_cookie_generate"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"

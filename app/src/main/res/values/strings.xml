@@ -27,6 +27,7 @@
     <string name="standard_title">常驻祈愿</string>
     <string name="weapon_title">武器活动祈愿</string>
     <string name="overview">一共 0 抽，已累计 0 抽未出金，累计 0 抽未出紫</string>
+    <string name="up_five_level">up五星：</string>
     <string name="five_level">五星：</string>
     <string name="four_level">四星：</string>
     <string name="three_level">三星：</string>
@@ -39,4 +40,8 @@
     <string name="show_four_sequence"><u>已隐藏，点击展开</u></string>
     <string name="check_new_version"><u>检查新版本</u></string>
     <string name="imitate_wish"><u>☞模拟抽卡（文字版）</u></string>
+    <string name="not_wai_ratio">五星不歪率：</string>
+    <string name="wai_ratio">五星已歪率：</string>
+    <string name="continue_not_wai_num">最大连续不歪数：</string>
+    <string name="continue_wai_num">最大连续已歪数：</string>
 </resources>

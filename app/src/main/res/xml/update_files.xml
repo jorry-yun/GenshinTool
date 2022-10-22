@@ -2,20 +2,26 @@
 <resources>
     <paths>
         <!--<external-path name="camera_out_file" path="TQImageSelector/CameraImage/" />-->
-        <external-files-path
-            name="camera_out_file"
-            path="Pictures/" />
+<!--        <external-files-path-->
+<!--            name="camera_out_file"-->
+<!--            path="Pictures/" />-->
+
+<!--        <external-path-->
+<!--            name="rc_external_path"-->
+<!--            path="." />-->
+
+<!--        <external-path-->
+<!--            name="my_images"-->
+<!--            path="Android/data/xxxx.FileProvider/files/Pictures" />-->
+
+<!--        <root-path-->
+<!--            name="rc_root_path"-->
+<!--            path="" />-->
 
         <external-path
-            name="rc_external_path"
-            path="." />
+            path="" name="download"/>
 
         <external-path
-            name="my_images"
-            path="Android/data/xxxx.FileProvider/files/Pictures" />
-
-        <root-path
-            name="rc_root_path"
-            path="" />
+            path="" name="Camera_photos"/>
     </paths>
 </resources>

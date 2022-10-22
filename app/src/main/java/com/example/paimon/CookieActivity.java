@@ -52,17 +52,19 @@ public class CookieActivity extends AppCompatActivity {
         myWebView.getSettings().setJavaScriptEnabled(true);
         myWebView.getSettings().setDomStorageEnabled(true);
         myWebView.loadUrl("https://user.mihoyo.com");
-//        EditText cookieEdit = findViewById(R.id.activity_cookie_content);
         findViewById(R.id.activity_cookie_generate).setOnClickListener((view) -> {
-//            String cookie = cookieEdit.getText().toString();
             CookieManager instance = CookieManager.getInstance();
             String cookie = instance.getCookie("https://user.mihoyo.com");
-//            HttpUtil.getAuthKey(cookie, handle)
-//            if (StringUtil.isBlank(cookie)) {
-//                Toast.makeText(this, "请粘贴cookie", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
             AuthKeyUtil.getInstance().getAuthkey(cookie, handler3);
+        });
+        findViewById(R.id.activity_cookie_copy).setOnClickListener((view) -> {
+            CookieManager instance = CookieManager.getInstance();
+            String cookie = instance.getCookie("https://user.mihoyo.com");
+            //获取剪切板管理器
+            boolean success = CommUtil.getInstance().copyStr(CookieActivity.this, cookie);
+            if (success) {
+                Toast.makeText(CookieActivity.this, "复制成功", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

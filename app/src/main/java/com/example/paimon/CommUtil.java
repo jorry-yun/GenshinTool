@@ -199,10 +199,10 @@ public class CommUtil {
 
     private Long downloadId;
     private boolean isRegisterReceiver = false;
-    private void setReceiver(Context context) {
+    private void setReceiver(Context context, String apkName) {
         if (!isRegisterReceiver) {
             DownloadReceiver receiver = new DownloadReceiver();
-            DownloadReceiver.apkName = "genshinTool_1.2.apk";
+            DownloadReceiver.apkName = apkName;
             IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
             context.registerReceiver(receiver, intentFilter);
             isRegisterReceiver = true;
@@ -236,7 +236,7 @@ public class CommUtil {
                     UpdateInfoDialog dialog = UpdateInfoDialog.getInstance(context).createDialog(history);
                     dialog.setOnConfirmClickListener(view -> {
                         // 注册广播
-                        setReceiver(context);
+                        setReceiver(context, history.getApkName());
                         if (downloadId != null) {
                             HttpUtil.clearCurrentTask(context, downloadId);
                         }

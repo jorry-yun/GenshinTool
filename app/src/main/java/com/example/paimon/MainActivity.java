@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -134,12 +135,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void changeElementHideOrShow(String prefix, String code, String id) {
-        LinearLayout element = findViewById(id);
-        element.removeAllViews();
-        String showStr = getResources().getString(R.string.show_four_sequence);
-        TextView textView = CommUtil.getInstance().generateTextView(this, R.color.blue, showStr);
-        element.addView(textView);
-        textView.setOnClickListener((view) -> {
+        TextView element = findViewById(id);
+//        element.removeAllViews();
+//        TextView textView = CommUtil.getInstance().generateTextView(this, R.color.blue, showStr);
+//        element.addView(textView);
+        element.setText(getResources().getString(R.string.show_four_sequence));
+        element.setTextColor(getResources().getColor(R.color.blue));
+        element.setOnClickListener((view) -> {
             String character = CommUtil.getInstance().readCacheFile(this, currentAccount + "-" + code + ".json", "[]");
             List<WishVo> wishVos = GsonUtil.jsonToList(character, WishVo.class);
             Map<String, Object> result = analysis(wishVos);
@@ -327,6 +329,23 @@ public class MainActivity extends AppCompatActivity {
             SpannableStringBuilder upFiveExpendStyle = new SpannableStringBuilder(five_avg_up);
             upFiveExpendStyle.setSpan(new ForegroundColorSpan(Color.MAGENTA), 11, five_avg_up.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
             partFiveAvgUp.setText(upFiveExpendStyle);
+            // up五星数
+            TextView character_up_five_num = findViewById(R.id.character_up_five_num);
+            character_up_five_num.setText((String) result.get("character_up_five_num"));
+            TextView character_up_five_pro = findViewById(R.id.character_up_five_pro);
+            character_up_five_pro.setText((String) result.get("character_up_five_pro"));
+            // 五星不歪率
+            TextView not_wai_ratio = findViewById(R.id.not_wai_ratio);
+            not_wai_ratio.setText((String) result.get("not_wai_ratio"));
+            // 五星已歪率
+            TextView wai_ratio = findViewById(R.id.wai_ratio);
+            wai_ratio.setText((String) result.get("wai_ratio"));
+            // 最大连续不歪数
+            TextView continue_not_wai_num = findViewById(R.id.continue_not_wai_num);
+            continue_not_wai_num.setText((Integer) result.get("continue_not_wai_num") + "个");
+            // 最大连续已歪数
+            TextView continue_wai_num = findViewById(R.id.continue_wai_num);
+            continue_wai_num.setText((Integer) result.get("continue_wai_num") + "个");
         }
         // 四星平均出货抽数样式
         SpannableStringBuilder fourExpendStyle = new SpannableStringBuilder(four_avg);
@@ -336,11 +355,12 @@ public class MainActivity extends AppCompatActivity {
         addSequence((List<WishVo>) result.get("five_seq"), findViewById(prefix + "_five_seq"), "金");
         // 设置四星出货顺序
 //        addSequence((List<WishVo>) result.get("four_seq"), findViewById(prefix + "_four_seq"), "紫");
-        LinearLayout element = findViewById(prefix + "_four_seq");
-        String showStr = getResources().getString(R.string.show_four_sequence);
-        TextView textView = CommUtil.getInstance().generateTextView(this, R.color.blue, showStr);
-        element.addView(textView);
-        textView.setOnClickListener((view) -> {
+        TextView element = findViewById(prefix + "_four_seq");
+//        TextView textView = CommUtil.getInstance().generateTextView(this, R.color.blue, showStr);
+//        element.addView(textView);
+        element.setText(getResources().getString(R.string.show_four_sequence));
+        element.setTextColor(getResources().getColor(R.color.blue));
+        element.setOnClickListener((view) -> {
 //            String character = CommUtil.getInstance().readCacheFile(this, currentAccount + "-" + code + ".json", "[]");
 //            showDetail(GsonUtil.jsonToList(character, WishVo.class), prefix, code);
             addSequence((List<WishVo>) result.get("four_seq"), findViewById(prefix + "_four_seq"), "紫");
@@ -357,8 +377,8 @@ public class MainActivity extends AppCompatActivity {
         TextView threePro = findViewById(prefix + "_three_pro");
         TextView fiveAvg = findViewById(prefix + "_five_avg");
         TextView fourAvg = findViewById(prefix + "_four_avg");
-        LinearLayout fiveSeq = findViewById(prefix + "_five_seq");
-        LinearLayout fourSeq = findViewById(prefix + "_four_seq");
+//        LinearLayout fiveSeq = findViewById(prefix + "_five_seq");
+//        LinearLayout fourSeq = findViewById(prefix + "_four_seq");
         overview.setText(getResources().getString(R.string.overview));
         fiveNum.setText(getResources().getString(R.string.five_level));
         fourNum.setText(getResources().getString(R.string.four_level));
@@ -368,8 +388,8 @@ public class MainActivity extends AppCompatActivity {
         threePro.setText(getResources().getString(R.string.empty_probability));
         fiveAvg.setText(getResources().getString(R.string.five_avg));
         fourAvg.setText(getResources().getString(R.string.four_avg));
-        fiveSeq.removeAllViews();
-        fourSeq.removeAllViews();
+//        fiveSeq.removeAllViews();
+//        fourSeq.removeAllViews();
     }
 
     private SpannableStringBuilder getOverviewStyle(List<WishVo> wishVo, String overview) {
@@ -384,31 +404,17 @@ public class MainActivity extends AppCompatActivity {
         return overviewStyle;
     }
 
-    private void addSequence(List<WishVo> wishList, LinearLayout content, String color) {
-        // 一行能放字数极限
-        int limit = 32;
-        LinearLayout line = null;
-        if (wishList.isEmpty()) {
-            content.addView(CommUtil.getInstance().generateTextView(this, R.color.purple_200, "还未出" + color));
+    private void addSequence(List<WishVo> wishList, TextView content, String color) {
+        content.setText("");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            content.setLineHeight(SystemUtil.Px2Dp(this, 200));
         }
-        content.removeAllViews();
-        int remain = limit;
-        for (WishVo wishVo : wishList) {
+        SpannableStringBuilder style = new SpannableStringBuilder();
+        for (int i = 0; i < wishList.size(); i++) {
+            WishVo wishVo = wishList.get(i);
             // 四星模拟数据跳过
             if ("紫".equals(color) && "-1".equals(wishVo.getId())) {
                 continue;
-            }
-            // 一行剩余能放的字数（+2：两个括号，+1：空格）
-            int length = wishVo.getName().length() * 2 + wishVo.getCount().length() + 2 + 1;
-            remain -= length;
-            if (line == null || remain < 0) {
-                line = new LinearLayout(MainActivity.this);
-                LinearLayout.LayoutParams lLayoutParams = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                lLayoutParams.setLayoutDirection(LinearLayout.HORIZONTAL);
-                line.setLayoutParams(lLayoutParams);
-                content.addView(line);
             }
             // 计算颜色
             Integer colorId = CharacterStyle.get(wishVo.getName());
@@ -421,16 +427,62 @@ public class MainActivity extends AppCompatActivity {
                 }
                 colorId = colorId == null ? R.color.default_color : colorId;
             }
-            // 将EditText放到LinearLayout里
-            line.addView(CommUtil.getInstance().generateTextView(this, colorId, wishVo.getName() + "(" + wishVo.getCount() + ")"));
-            remain = remain < 0 ? limit - length : remain;
+            String name = wishVo.getName() + "(" + wishVo.getCount() + ")";
+            name = i == 0 ? name : "   " + name;
+            int start = style.length();
+            style.append(name);
+            style.setSpan(new ForegroundColorSpan(getResources().getColor(colorId)), start, start + name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
+        content.setText(style);
     }
+
+//    private void addSequence(List<WishVo> wishList, LinearLayout content, String color) {
+//        // 一行能放字数极限
+//        int limit = 32;
+//        LinearLayout line = null;
+//        if (wishList.isEmpty()) {
+//            content.addView(CommUtil.getInstance().generateTextView(this, R.color.purple_200, "还未出" + color));
+//        }
+//        content.removeAllViews();
+//        int remain = limit;
+//        for (WishVo wishVo : wishList) {
+//            // 四星模拟数据跳过
+//            if ("紫".equals(color) && "-1".equals(wishVo.getId())) {
+//                continue;
+//            }
+//            // 一行剩余能放的字数（+2：两个括号，+1：空格）
+//            int length = wishVo.getName().length() * 2 + wishVo.getCount().length() + 2 + 1;
+//            remain -= length;
+//            if (line == null || remain < 0) {
+//                line = new LinearLayout(MainActivity.this);
+//                LinearLayout.LayoutParams lLayoutParams = new LinearLayout.LayoutParams(
+//                        ViewGroup.LayoutParams.MATCH_PARENT,
+//                        ViewGroup.LayoutParams.WRAP_CONTENT);
+//                lLayoutParams.setLayoutDirection(LinearLayout.HORIZONTAL);
+//                line.setLayoutParams(lLayoutParams);
+//                content.addView(line);
+//            }
+//            // 计算颜色
+//            Integer colorId = CharacterStyle.get(wishVo.getName());
+//            if (colorId == null) {
+//                if ("4".equals(wishVo.getRank_type())) {
+//                    colorId = R.color.purple_200;
+//                }
+//                if ("5".equals(wishVo.getRank_type())) {
+//                    colorId = R.color.gold;
+//                }
+//                colorId = colorId == null ? R.color.default_color : colorId;
+//            }
+//            // 将EditText放到LinearLayout里
+//            line.addView(CommUtil.getInstance().generateTextView(this, colorId, wishVo.getName() + "(" + wishVo.getCount() + ")"));
+//            remain = remain < 0 ? limit - length : remain;
+//        }
+//    }
 
     private Map<String, Object> analysis(List<WishVo> wishList) {
         Map<String, Object> result = new HashMap<>();
         result.put("total", wishList.size() + "");
-        Set<String> standardCharacter = new HashSet<>(Arrays.asList("迪卢克", "琴", "莫娜", "刻晴", "七七"));
+        Set<String> standardCharacter = new HashSet<>(Arrays.asList("迪卢克", "琴", "莫娜", "刻晴", "七七", "提纳里"));
         // 五星角色
         List<WishVo> fivePart = getCharacterSequence(wishList, 5);
         // 四星角色
@@ -439,6 +491,10 @@ public class MainActivity extends AppCompatActivity {
         result.put("five_seq", fivePart);
         // 四星出货顺序
         result.put("four_seq", fourPart);
+        // up五星数量
+        long up_five_num = fivePart.stream().filter(wishVo -> !standardCharacter.contains(wishVo.getName())).count();
+        result.put("character_up_five_num", "up五星：" + (up_five_num == 0L ? "还未出up" : up_five_num));
+        result.put("character_up_five_pro", "【 " + (wishList.size() == 0 ? "0": round(up_five_num * 1.0 / wishList.size())) + "% 】");
         // 五星数量
         long five = fivePart.size();
         result.put("five_num", "五星：" + (five == 0L ? "还未出金" : five));
@@ -455,14 +511,78 @@ public class MainActivity extends AppCompatActivity {
         IntSummaryStatistics five_total = fivePart.stream().map(WishVo::getCount).map(Integer::parseInt).collect(Collectors.summarizingInt(Integer::intValue));
         result.put("five_avg", "五星平均出货抽数：" + (five == 0L ? "还未出金" : round(five_total.getAverage() / 100)));
         // up五星平均出货抽数
-        long up_five_num = fivePart.stream().filter(wishVo -> !standardCharacter.contains(wishVo.getName())).count();
         result.put("five_avg_up", "up五星平均出货抽数：" + (five == 0L || up_five_num == 0L ? "还未出up五星" : round(five_total.getSum() / up_five_num * 1.0 / 100)));
         // 四星平均出货抽数
         Double four_avg = fourPart.stream().map(WishVo::getCount).map(Integer::parseInt).collect(Collectors.averagingInt((Integer::intValue)));
         result.put("four_avg", "四星平均出货抽数：" + (four == 0L ? "还未出紫" : round( four_avg / 100)));
         // 概览（多少抽未出紫，多少抽未出金）
         result.put("overview", getOverview(wishList));
+        // 五星不歪率
+        // 第一个是常驻角色，则少减一个
+        int standard = 0;
+        if (five != 0 && standardCharacter.contains(fivePart.get(0).getName())) {
+            standard = 1;
+        }
+        long notWaiRatio = five == 0L ? 0 : (five - 2 * (five - up_five_num) + standard) * 100 / (up_five_num + standard);
+        result.put("not_wai_ratio", notWaiRatio + "%");
+        // 五星已歪率
+        result.put("wai_ratio", (100 - notWaiRatio) + "%");
+        // 最大连续不歪数
+        int notWai = continueNotWaiCharacterNum(fivePart);
+        result.put("continue_not_wai_num", notWai);
+        // 最大连续不歪数
+        int continue_wai_num = continueWaiCharacterNum(fivePart);
+        result.put("continue_wai_num", continue_wai_num);
         return result;
+    }
+
+    /**
+     * 最大连续不歪数
+     */
+    private int continueNotWaiCharacterNum(List<WishVo> fivePart) {
+        Set<String> standardCharacter = new HashSet<>(Arrays.asList("迪卢克", "琴", "莫娜", "刻晴", "七七", "提纳里"));
+        if (fivePart == null || fivePart.isEmpty()) {
+            return 0;
+        }
+        int max = 0;
+        int count = !standardCharacter.contains(fivePart.get(fivePart.size() - 1).getName()) ? 1 : 0;
+        for (int i = fivePart.size() - 2; i >= 0; i--) {
+            // 当前命中
+            boolean currentHit = !standardCharacter.contains(fivePart.get(i).getName());
+            // 上一个命中
+            boolean lastHit = !standardCharacter.contains(fivePart.get(i + 1).getName());
+            if (currentHit && lastHit) {
+                count ++;
+            } else {
+                max = Math.max(max, count);
+                count =  0;
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 最大连续已歪数
+     */
+    private int continueWaiCharacterNum(List<WishVo> fivePart) {
+        Set<String> standardCharacter = new HashSet<>(Arrays.asList("迪卢克", "琴", "莫娜", "刻晴", "七七", "提纳里"));
+        if (fivePart == null || fivePart.isEmpty()) {
+            return 0;
+        }
+        int max = 0;
+        int count = 0;
+        for (int i = fivePart.size() - 1; i >= 0; i--) {
+            // 当前命中
+            boolean wai = standardCharacter.contains(fivePart.get(i).getName());
+            if (wai) {
+                count++;
+                max = Math.max(max, count);
+                i --;
+            } else {
+                count = 0;
+            }
+        }
+        return max;
     }
 
     /**

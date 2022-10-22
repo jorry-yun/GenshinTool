@@ -19,7 +19,7 @@
             android:theme="@style/Theme.Paimon.AppBarOverlay"
             android:paddingTop="10dp"
             android:paddingStart="10dp"
-            android:paddingEnd="10dp"
+            android:paddingEnd="20dp"
             android:paddingBottom="20dp"
             android:orientation="vertical">
 
@@ -159,6 +159,15 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/character_up_five_num"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="20dp"
+                            android:text="@string/up_five_level"
+                            android:textColor="#D59432" />
+
+                        <TextView
                             android:id="@+id/character_five_num"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -192,6 +201,16 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/character_up_five_pro"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="20dp"
+                            android:text="@string/empty_probability"
+                            android:textColor="#D59432" />
+
+                        <TextView
                             android:id="@+id/character_five_pro"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -222,16 +241,90 @@
                             android:textColor="#7396C2" />
                     </LinearLayout>
 
-                    <!--                    <LinearLayout-->
-                    <!--                        android:layout_width="match_parent"-->
-                    <!--                        android:layout_height="wrap_content">-->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="-20dp"
+                        android:gravity="end">
 
-                    <!--                        <TextView-->
-                    <!--                            android:layout_width="wrap_content"-->
-                    <!--                            android:layout_height="wrap_content"-->
-                    <!--                            android:background=""-->
-                    <!--                            android:text="欧"/>-->
-                    <!--                    </LinearLayout>-->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginEnd="20dp"
+                                android:textColor="#D59432"
+                                android:text="@string/not_wai_ratio"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginEnd="20dp"
+                                android:textColor="#D59432"
+                                android:text="@string/wai_ratio"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginEnd="20dp"
+                                android:textColor="@color/blue"
+                                android:text="@string/continue_not_wai_num"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginEnd="20dp"
+                                android:textColor="@color/purple_200"
+                                android:text="@string/continue_wai_num"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="-15dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/not_wai_ratio"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:textColor="#D59432"
+                                android:text=""/>
+
+                            <TextView
+                                android:id="@+id/wai_ratio"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:textColor="#D59432"
+                                android:text=""/>
+
+                            <TextView
+                                android:id="@+id/continue_not_wai_num"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:textColor="@color/blue"
+                                android:text=""/>
+
+                            <TextView
+                                android:id="@+id/continue_wai_num"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:textColor="@color/purple_200"
+                                android:text=""/>
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -272,13 +365,12 @@
                         android:text="@string/five_seq"
                         android:textColor="@color/default_color" />
 
-                    <LinearLayout
+                    <TextView
                         android:id="@+id/character_five_seq"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                    </LinearLayout>
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/default_color" />
 
                 </LinearLayout>
 
@@ -295,13 +387,12 @@
                         android:text="@string/four_seq"
                         android:textColor="@color/default_color" />
 
-                    <LinearLayout
+                    <TextView
                         android:id="@+id/character_four_seq"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                    </LinearLayout>
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/default_color" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -433,14 +524,12 @@
                         android:textColor="@color/default_color"
                         android:text="@string/five_seq"/>
 
-                    <LinearLayout
+                    <TextView
                         android:id="@+id/standard_five_seq"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                    </LinearLayout>
-
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/default_color" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -456,13 +545,12 @@
                         android:textColor="@color/default_color"
                         android:text="@string/four_seq"/>
 
-                    <LinearLayout
+                    <TextView
                         android:id="@+id/standard_four_seq"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                    </LinearLayout>
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/default_color" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -580,7 +668,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:layout_marginBottom="20dp"
                     android:textColor="@color/default_color"
                     android:text="@string/four_avg"/>
 
@@ -596,13 +683,12 @@
                         android:textColor="@color/default_color"
                         android:text="@string/five_seq"/>
 
-                    <LinearLayout
+                    <TextView
                         android:id="@+id/weapon_five_seq"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                    </LinearLayout>
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/default_color" />
 
                 </LinearLayout>
 
@@ -619,25 +705,15 @@
                         android:textColor="@color/default_color"
                         android:text="@string/four_seq"/>
 
-                    <LinearLayout
+                    <TextView
                         android:id="@+id/weapon_four_seq"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                    </LinearLayout>
-
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/default_color" />
                 </LinearLayout>
             </LinearLayout>
 
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:textColor="@color/blue"-->
-<!--                android:textSize="@dimen/small_font_size"-->
-<!--                android:layout_marginStart="10dp"-->
-<!--                android:layout_marginBottom="20dp"-->
-<!--                android:text="@string/imitate_wish"/>-->
 
             <LinearLayout
                 android:layout_width="match_parent"
