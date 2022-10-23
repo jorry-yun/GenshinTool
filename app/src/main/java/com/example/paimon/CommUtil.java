@@ -28,6 +28,7 @@ import com.example.paimon.util.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CommUtil {
 
@@ -108,6 +109,21 @@ public class CommUtil {
         } catch (IOException e) {
             Log.e(e);
         }
+    }
+
+    public List<String> getAccounts(Context context) {
+        String path = context.getResources().getString(R.string.cache_path);
+        path = getFileRoot(context) + path;
+        File dir = new File(path);
+        if (!dir.exists() || dir.listFiles() == null) {
+            return new ArrayList<>();
+        }
+        return Arrays.stream(dir.listFiles())
+                        .map(File::getName)
+                        .map(name -> name.substring(0, name.indexOf("-")))
+                        .filter(name -> name.matches("\\d{9}"))
+                        .distinct()
+                        .collect(Collectors.toList());
     }
 
     public String readCacheFile(Context context, String fileName, String defaultValue) {

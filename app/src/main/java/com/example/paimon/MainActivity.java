@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         content.setText(cacheUrl);
         // 监听按钮点击事件
         setOnClickListener(content, cache);
-        List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
+        List<String> uids = CommUtil.getInstance().getAccounts(this);
         createAccount(uids);
         if (!uids.isEmpty()) {
             showCacheRecord(uids.get(0));
@@ -118,12 +118,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean accountToTop(String account) {
-        SharedPreferences cache = CommUtil.getInstance().getSharedPreferences(this);
-        List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
+        List<String> uids = CommUtil.getInstance().getAccounts(this);
         if (uids.contains(account)) {
             uids.remove(account);
             uids.add(0, account);
-            cache.edit().putString("uid", GsonUtil.toJson(uids)).apply();
             createAccount(uids);
         }
         return true;
@@ -206,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout account = findViewById(R.id.account);
         account.removeAllViews();
         if (!uids.isEmpty()) {
-            for (List<String> list : CommUtil.getInstance().splitList(uids, 4)) {
+            for (List<String> list : CommUtil.getInstance().splitList(uids, 3)) {
                 // 一行
                 LinearLayout line = new LinearLayout(MainActivity.this);
                 LinearLayout.LayoutParams lLayoutParams = new LinearLayout.LayoutParams(
@@ -267,12 +265,10 @@ public class MainActivity extends AppCompatActivity {
         }
         String uid = wishList.get(0).getUid();
         // 处理uid
-        SharedPreferences cache = CommUtil.getInstance().getSharedPreferences(this);
-        List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
+        List<String> uids = CommUtil.getInstance().getAccounts(this);
         if (!uids.contains(uid)) {
             uids.add(uid);
         }
-        cache.edit().putString("uid", GsonUtil.toJson(uids)).apply();
         createAccount(uids);
         // 处理祈愿历史记录
         String history = CommUtil.getInstance().readCacheFile(this, uid + "-" + type + ".json", "[]");
@@ -558,7 +554,7 @@ public class MainActivity extends AppCompatActivity {
                 count =  0;
             }
         }
-        return max;
+        return Math.max(max, count);
     }
 
     /**
