@@ -118,10 +118,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean accountToTop(String account) {
+        SharedPreferences cache = CommUtil.getInstance().getSharedPreferences(this);
         List<String> uids = CommUtil.getInstance().getAccounts(this);
         if (uids.contains(account)) {
             uids.remove(account);
             uids.add(0, account);
+            cache.edit().putString("uid", GsonUtil.toJson(uids)).apply();
             createAccount(uids);
         }
         return true;
@@ -204,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout account = findViewById(R.id.account);
         account.removeAllViews();
         if (!uids.isEmpty()) {
-            for (List<String> list : CommUtil.getInstance().splitList(uids, 3)) {
+            for (List<String> list : CommUtil.getInstance().splitList(uids, 4)) {
                 // 一行
                 LinearLayout line = new LinearLayout(MainActivity.this);
                 LinearLayout.LayoutParams lLayoutParams = new LinearLayout.LayoutParams(

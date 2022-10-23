@@ -112,18 +112,23 @@ public class CommUtil {
     }
 
     public List<String> getAccounts(Context context) {
+        SharedPreferences cache = CommUtil.getInstance().getSharedPreferences(context);
+        List<String> uids = GsonUtil.jsonToList(cache.getString("uid", "[]"), String.class);
         String path = context.getResources().getString(R.string.cache_path);
         path = getFileRoot(context) + path;
         File dir = new File(path);
         if (!dir.exists() || dir.listFiles() == null) {
-            return new ArrayList<>();
+            return uids;
         }
-        return Arrays.stream(dir.listFiles())
-                        .map(File::getName)
-                        .map(name -> name.substring(0, name.indexOf("-")))
-                        .filter(name -> name.matches("\\d{9}"))
-                        .distinct()
-                        .collect(Collectors.toList());
+        List<String> list = Arrays.stream(dir.listFiles())
+                .map(File::getName)
+                .map(name -> name.substring(0, name.indexOf("-")))
+                .filter(name -> name.matches("\\d{9}"))
+                .distinct()
+                .collect(Collectors.toList());
+        list.removeAll(uids);
+        uids.addAll(list);
+        return uids;
     }
 
     public String readCacheFile(Context context, String fileName, String defaultValue) {
