@@ -1,6 +1,8 @@
 # GenshinTool
 原神工具包——抽卡分析（android）
 
+如果这个项目帮助到了你，就给我一个免费的star吧
+
 安装包高速下载（速度快） [原神抽卡分析.apk](https://files.cnblogs.com/files/blogs/682374/genshinTool_1.5.2.apk?t=1666283328)（如遇禁止访问，请右键蓝色字体复制链接，新开浏览器页签粘贴访问即可）
 
 安装包github下载（速度较慢） [原神抽卡分析.apk](https://github.com/jorry-yun/GenshinTool/raw/master/%E5%AE%89%E8%A3%85%E5%8C%85/genshinTool_1.5.2.apk)
