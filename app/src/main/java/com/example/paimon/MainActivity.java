@@ -480,7 +480,6 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, Object> analysis(List<WishVo> wishList) {
         Map<String, Object> result = new HashMap<>();
         result.put("total", wishList.size() + "");
-        Set<String> standardCharacter = new HashSet<>(Arrays.asList("迪卢克", "琴", "莫娜", "刻晴", "七七", "提纳里"));
         // 五星角色
         List<WishVo> fivePart = getCharacterSequence(wishList, 5);
         // 四星角色
@@ -490,7 +489,7 @@ public class MainActivity extends AppCompatActivity {
         // 四星出货顺序
         result.put("four_seq", fourPart);
         // up五星数量
-        long up_five_num = fivePart.stream().filter(wishVo -> !standardCharacter.contains(wishVo.getName())).count();
+        long up_five_num = fivePart.stream().filter(this::isUpCharacter).count();
         result.put("character_up_five_num", "up五星：" + (up_five_num == 0L ? "还未出up" : up_five_num));
         result.put("character_up_five_pro", "【 " + (wishList.size() == 0 ? "0": round(up_five_num * 1.0 / wishList.size())) + "% 】");
         // 五星数量
@@ -518,7 +517,7 @@ public class MainActivity extends AppCompatActivity {
         // 五星不歪率
         // 第一个是常驻角色，则少减一个
         int standard = 0;
-        if (five != 0 && standardCharacter.contains(fivePart.get(0).getName())) {
+        if (five != 0 && !isUpCharacter(fivePart.get(0))) {
             standard = 1;
         }
         long notWaiRatio = five == 0L ? 0 : (five - 2 * (five - up_five_num) + standard) * 100 / (up_five_num + standard);
@@ -532,6 +531,25 @@ public class MainActivity extends AppCompatActivity {
         int continue_wai_num = continueWaiCharacterNum(fivePart);
         result.put("continue_wai_num", continue_wai_num);
         return result;
+    }
+    
+    private boolean isUpCharacter(WishVo wishVo) {
+        List<StandardCharacter> standardCharacter = Arrays.asList(new StandardCharacter("迪卢克"),
+                new StandardCharacter("琴"), new StandardCharacter("莫娜"), new StandardCharacter("七七"),
+                new StandardCharacter("刻晴", DateUtils.universalParseDate("2021-02-17 18:00:00"), DateUtils.universalParseDate("2021-03-02 18:00:00")),
+                new StandardCharacter("提纳里", DateUtils.universalParseDate("2022-08-24"), DateUtils.universalParseDate("2022-09-09 18:00:00")),
+                new StandardCharacter("迪希雅", DateUtils.universalParseDate("2023-03-01"), DateUtils.universalParseDate("2023-03-21 18:00:00")));
+        boolean nameMatched = standardCharacter.stream().anyMatch(character -> character.getName().equals(wishVo.getName()));
+        if (!nameMatched) {
+            return true;
+        }
+        Date wishTime = DateUtils.universalParseDate(wishVo.getTime());
+        if (wishTime == null) {
+            return false;
+        }
+        return standardCharacter.stream().filter(character -> character.getStart() != null && character.getEnd() != null)
+                .anyMatch(character -> character.getName().equals(wishVo.getName()) &&
+                        wishTime.before(character.getEnd()) && wishTime.after(character.getStart()));
     }
 
     /**
