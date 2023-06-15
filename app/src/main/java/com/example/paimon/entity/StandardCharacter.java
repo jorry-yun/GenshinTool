@@ -22,13 +22,13 @@ public class StandardCharacter {
     private static final Map<String, String> map = new HashMap<>();
 
     static {
-        map.put("迪卢克", null);
-        map.put("刻晴", "2021-02-17 18:00:00到2021-03-02 18:00:00");
-        map.put("莫娜", null);
-        map.put("琴", null);
-        map.put("七七", null);
-        map.put("提纳里", "2022-08-24 00:00:00到2022-09-09 18:00:00");
-        map.put("迪希雅", "2023-03-01 00:00:00到2023-03-21 18:00:00");
+        StandardCharacter.map.put("迪卢克", null);
+        StandardCharacter.map.put("刻晴", "2021-02-17 18:00:00到2021-03-02 18:00:00");
+        StandardCharacter.map.put("莫娜", null);
+        StandardCharacter.map.put("琴", null);
+        StandardCharacter.map.put("七七", null);
+        StandardCharacter.map.put("提纳里", "2022-08-24 00:00:00到2022-09-09 18:00:00");
+        StandardCharacter.map.put("迪希雅", "2023-03-01 00:00:00到2023-03-21 18:00:00");
     }
 
     private String name;
@@ -71,7 +71,7 @@ public class StandardCharacter {
     private Date end;
 
     public static void pullConfig(Context context) {
-        String url = context.getResources().getString(R.string.url_character_style);
+        String url = context.getResources().getString(R.string.url_standard_character);
         new HttpUtil().get(url, Map.class, new HttpCallBack<Map>() {
             @Override
             public void onSuccess(Map map) {
@@ -86,7 +86,7 @@ public class StandardCharacter {
             }
         });
         String content = CommUtil.getInstance().readCacheFile(context, "standard-character.json", "{}");
-        map.putAll(GsonUtil.parseJson(content, Map.class));
+        StandardCharacter.map.putAll(GsonUtil.parseJson(content, Map.class));
     }
 
     public static List<StandardCharacter> getList() {

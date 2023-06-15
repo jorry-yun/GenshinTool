@@ -85,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences cache = CommUtil.getInstance().getSharedPreferences(this);
         String cacheUrl = cache.getString("content", "");
         content.setText(cacheUrl);
+        // 获取最新角色配置信息
+        CharacterStyle.pullConfig(this);
+        StandardCharacter.pullConfig(this);
         // 监听按钮点击事件
         setOnClickListener(content, cache);
         List<String> uids = CommUtil.getInstance().getAccounts(this);
@@ -112,10 +115,6 @@ public class MainActivity extends AppCompatActivity {
             Intent tipsIntent = new Intent(this, CookieActivity.class);
             startActivity(tipsIntent);
         });
-
-        // 获取最新角色配置信息
-        CharacterStyle.pullConfig(this);
-        StandardCharacter.pullConfig(this);
         // 检查更新
         CommUtil.getInstance().checkUpdate(this, true);
     }
