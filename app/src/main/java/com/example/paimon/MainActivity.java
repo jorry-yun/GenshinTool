@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 获取最新角色配置信息
         CharacterStyle.pullConfig(this);
+        StandardCharacter.pullConfig(this);
         // 检查更新
         CommUtil.getInstance().checkUpdate(this, true);
     }
@@ -536,11 +537,7 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private boolean isUpCharacter(WishVo wishVo) {
-        List<StandardCharacter> standardCharacter = Arrays.asList(new StandardCharacter("迪卢克"),
-                new StandardCharacter("琴"), new StandardCharacter("莫娜"), new StandardCharacter("七七"),
-                new StandardCharacter("刻晴", DateUtils.universalParseDate("2021-02-17 18:00:00"), DateUtils.universalParseDate("2021-03-02 18:00:00")),
-                new StandardCharacter("提纳里", DateUtils.universalParseDate("2022-08-24"), DateUtils.universalParseDate("2022-09-09 18:00:00")),
-                new StandardCharacter("迪希雅", DateUtils.universalParseDate("2023-03-01"), DateUtils.universalParseDate("2023-03-21 18:00:00")));
+        List<StandardCharacter> standardCharacter = StandardCharacter.getList();
         boolean nameMatched = standardCharacter.stream().anyMatch(character -> character.getName().equals(wishVo.getName()));
         if (!nameMatched) {
             return true;
@@ -558,17 +555,16 @@ public class MainActivity extends AppCompatActivity {
      * 最大连续不歪数
      */
     private int continueNotWaiCharacterNum(List<WishVo> fivePart) {
-        Set<String> standardCharacter = new HashSet<>(Arrays.asList("迪卢克", "琴", "莫娜", "刻晴", "七七", "提纳里"));
         if (fivePart == null || fivePart.isEmpty()) {
             return 0;
         }
         int max = 0;
-        int count = !standardCharacter.contains(fivePart.get(fivePart.size() - 1).getName()) ? 1 : 0;
+        int count = isUpCharacter(fivePart.get(fivePart.size() - 1)) ? 1 : 0;
         for (int i = fivePart.size() - 2; i >= 0; i--) {
             // 当前命中
-            boolean currentHit = !standardCharacter.contains(fivePart.get(i).getName());
+            boolean currentHit = isUpCharacter(fivePart.get(i));
             // 上一个命中
-            boolean lastHit = !standardCharacter.contains(fivePart.get(i + 1).getName());
+            boolean lastHit = isUpCharacter(fivePart.get(i + 1));
             if (currentHit && lastHit) {
                 count ++;
             } else {
@@ -583,7 +579,6 @@ public class MainActivity extends AppCompatActivity {
      * 最大连续已歪数
      */
     private int continueWaiCharacterNum(List<WishVo> fivePart) {
-        Set<String> standardCharacter = new HashSet<>(Arrays.asList("迪卢克", "琴", "莫娜", "刻晴", "七七", "提纳里"));
         if (fivePart == null || fivePart.isEmpty()) {
             return 0;
         }
@@ -591,7 +586,7 @@ public class MainActivity extends AppCompatActivity {
         int count = 0;
         for (int i = fivePart.size() - 1; i >= 0; i--) {
             // 当前命中
-            boolean wai = standardCharacter.contains(fivePart.get(i).getName());
+            boolean wai = !isUpCharacter(fivePart.get(i));
             if (wai) {
                 count++;
                 max = Math.max(max, count);

@@ -13,6 +13,7 @@
     <string name="url_wish_template">https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?%s&amp;page=%s&amp;size=20&amp;end_id=%s</string>
     <string name="url_wish_sea_template">https://hk4e-api-os.hoyoverse.com/event/gacha_info/api/getGachaLog?%s&amp;page=%s&amp;size=20&amp;end_id=%s</string>
     <string name="url_app_update_msg">https://files.cnblogs.com/files/blogs/682374/app-update-msg.json</string>
+    <string name="url_standard_character">https://files.cnblogs.com/files/blogs/682374/standard_character.json</string>
 
 
     <string name="hello_first_fragment">Hello first fragment</string>
