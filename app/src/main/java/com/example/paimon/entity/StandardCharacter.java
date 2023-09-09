@@ -75,6 +75,7 @@ public class StandardCharacter {
         new HttpUtil().get(url, Map.class, new HttpCallBack<Map>() {
             @Override
             public void onSuccess(Map map) {
+                StandardCharacter.map.clear();
                 StandardCharacter.map.putAll(map);
                 String content = GsonUtil.toJson(StandardCharacter.map);
                 CommUtil.getInstance().writeCacheFile(context, content, "standard-character.json");

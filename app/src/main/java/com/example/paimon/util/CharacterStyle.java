@@ -68,6 +68,7 @@ public class CharacterStyle {
         new HttpUtil().get(url, Map.class, new HttpCallBack<Map>() {
             @Override
             public void onSuccess(Map map) {
+                CharacterStyle.map.clear();
                 CharacterStyle.map.putAll(convertMap(map));
                 String content = GsonUtil.toJson(CharacterStyle.map);
                 CommUtil.getInstance().writeCacheFile(context, content, "character-style.json");
