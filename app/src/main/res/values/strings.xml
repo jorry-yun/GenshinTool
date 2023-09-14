@@ -45,4 +45,5 @@
     <string name="wai_ratio">五星已歪率：</string>
     <string name="continue_not_wai_num">最大连续不歪数：</string>
     <string name="continue_wai_num">最大连续已歪数：</string>
+    <string name="keystore">123456</string>
 </resources>

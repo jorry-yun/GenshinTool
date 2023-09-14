@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.paimon">
 
-    <permission android:name="android.permission.INSTALL_PACKAGES" />
-    <permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <permission android:name="android.permission.INSTALL_PACKAGES"
+        tools:ignore="ReservedSystemPermission" />
+    <permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+        tools:ignore="ReservedSystemPermission" />
 
     <uses-permission
         android:name="android.permission.INTERNET"
